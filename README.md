@@ -1,2 +1,2 @@
 # Merge Template
-Stage0 Merge template for Vue_Vuetify utils.
+Stage0 Merge template for Vue_Vuetify SPA.
