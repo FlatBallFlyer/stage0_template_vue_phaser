@@ -28,7 +28,7 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 # Ensure package.json uses exact published version for Docker build
 # Replace both file: references and version ranges with exact version
 # Note: For GitHub npm packages, use exact version (not ^) for better compatibility
-ARG SPA_UTILS_VERSION=0.2.0
+ARG SPA_UTILS_VERSION=0.1.0
 RUN sed -i \
         -e "s|\"@agile-learning-institute/spa_utils\": \"file:[^\"]*\"|\"@agile-learning-institute/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
         -e "s|\"@agile-learning-institute/spa_utils\": \"\\^[^\"]*\"|\"@agile-learning-institute/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \

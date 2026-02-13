@@ -28,14 +28,14 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 # Ensure package.json uses exact published version for Docker build
 # Replace both file: references and version ranges with exact version
 # Note: For GitHub npm packages, use exact version (not ^) for better compatibility
-ARG SPA_UTILS_VERSION=0.2.0
+ARG SPA_UTILS_VERSION=0.1.0
 RUN sed -i \
-        -e "s|\"@{{org.git_org}}/spa_utils\": \"file:[^\"]*\"|\"@{{org.git_org}}/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        -e "s|\"@{{org.git_org}}/spa_utils\": \"\\^[^\"]*\"|\"@{{org.git_org}}/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        -e "s|\"@{{org.git_org}}/spa_utils\": \"~[^\"]*\"|\"@{{org.git_org}}/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
+        -e "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"file:[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
+        -e "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"\\^[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
+        -e "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"~[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
         package.json && \
     echo "Package.json after version update:" && \
-    grep "@{{org.git_org}}/spa_utils" package.json
+    grep "@{{org.git_org}}/{{info.slug}}_spa_utils" package.json
 
 # Install dependencies
 # Use npm install (not npm ci) to regenerate package-lock.json without file: references
