@@ -30,12 +30,12 @@ RUN if [ -z "$GITHUB_TOKEN" ]; then \
 # Note: For GitHub npm packages, use exact version (not ^) for better compatibility
 ARG SPA_UTILS_VERSION=0.1.0
 RUN sed -i \
-        -e "s|\"@agile-learning-institute/spa_utils\": \"file:[^\"]*\"|\"@agile-learning-institute/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        -e "s|\"@agile-learning-institute/spa_utils\": \"\\^[^\"]*\"|\"@agile-learning-institute/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        -e "s|\"@agile-learning-institute/spa_utils\": \"~[^\"]*\"|\"@agile-learning-institute/spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
+        -e "s|\"@agile-learning-institute/mentorhub_spa_utils\": \"file:[^\"]*\"|\"@agile-learning-institute/mentorhub_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
+        -e "s|\"@agile-learning-institute/mentorhub_spa_utils\": \"\\^[^\"]*\"|\"@agile-learning-institute/mentorhub_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
+        -e "s|\"@agile-learning-institute/mentorhub_spa_utils\": \"~[^\"]*\"|\"@agile-learning-institute/mentorhub_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
         package.json && \
     echo "Package.json after version update:" && \
-    grep "@agile-learning-institute/spa_utils" package.json
+    grep "@agile-learning-institute/mentorhub_spa_utils" package.json
 
 # Install dependencies
 # Use npm install (not npm ci) to regenerate package-lock.json without file: references
