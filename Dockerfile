@@ -3,93 +3,41 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Install git (needed for GitHub npm packages)
-RUN apk add --no-cache git
-
-# Copy package.json first (for better layer caching)
-# Don't copy package-lock.json if it has file: references - we'll regenerate it
 COPY package.json ./
 
-# Set up .npmrc for GitHub npm packages
-# Uses GITHUB_TOKEN from build arg (CI uses GH_PAT, local can use GITHUB_TOKEN env var)
-# Note: ARG values don't persist to RUN commands, so we need to pass it as env var
-ARG GITHUB_TOKEN=
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
-RUN if [ -z "$GITHUB_TOKEN" ]; then \
-        echo "ERROR: GITHUB_TOKEN build arg is required for private GitHub npm packages" >&2 && \
-        echo "For local builds, use: export GITHUB_TOKEN=\$(cat ~/.DeveloperEdition/GITHUB_TOKEN)" >&2 && \
-        exit 1; \
-    fi && \
-    echo "@{{org.git_org}}:registry=https://npm.pkg.github.com" > .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc && \
-    chmod 600 .npmrc && \
-    echo ".npmrc created successfully"
+# .npmrc for GitHub Packages - GITHUB_TOKEN required (build fails if missing)
+ARG GITHUB_TOKEN
+RUN echo "@{{org.git_org}}:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
-# Ensure package.json uses exact published version for Docker build
-# Replace both file: references and version ranges with exact version
-# Note: For GitHub npm packages, use exact version (not ^) for better compatibility
+# Pin spa_utils version for reproducible builds
 ARG SPA_UTILS_VERSION=0.1.0
-RUN sed -i \
-        -e "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"file:[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        -e "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"\\^[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        -e "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"~[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" \
-        package.json && \
-    echo "Package.json after version update:" && \
-    grep "@{{org.git_org}}/{{info.slug}}_spa_utils" package.json
+RUN sed -i "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" package.json
 
-# Install dependencies
-# Use npm install (not npm ci) to regenerate package-lock.json without file: references
-# This ensures we get the published package from GitHub npm registry
-RUN echo "Installing dependencies..." && \
-    echo "Checking .npmrc:" && cat .npmrc | sed 's/authToken=.*/authToken=***/' && \
-    rm -f package-lock.json && \
-    npm install 2>&1 | tee /tmp/npm-install.log || (echo "npm install failed. Full log:" && cat /tmp/npm-install.log && exit 1)
+RUN npm install
 
-# Verify spa_utils package is installed and show details
-RUN echo "Verifying spa_utils installation..." && \
-    if npm list @{{org.git_org}}/spa_utils 2>/dev/null; then \
-        echo "✓ spa_utils package found"; \
-        npm list @{{org.git_org}}/spa_utils; \
-    else \
-        echo "✗ spa_utils package NOT found"; \
-        echo "Checking node_modules structure:"; \
-        ls -la node_modules/ | head -20 || true; \
-        ls -la node_modules/@{{org.git_org}}/ 2>&1 || echo "node_modules/@{{org.git_org}}/ does not exist"; \
-        echo "Checking package.json:"; \
-        grep -A 2 "@{{org.git_org}}/spa_utils" package.json || true; \
-        echo "Checking npm registry config:"; \
-        npm config get registry || true; \
-        npm config get @{{org.git_org}}:registry || true; \
-        exit 1; \
-    fi
-
-# Copy source code
 COPY . .
 RUN npm run build
 
-# Get branch and patch level, then create patch.txt file
-RUN DATE=$(date "+%Y-%m-%d:%H:%M:%S") && \
-    echo $DATE > ./dist/patch.txt
+RUN DATE=$(date "+%Y-%m-%d:%H:%M:%S") && echo "$DATE" > ./dist/patch.txt
 
-# Deployment stage
-FROM nginx:stable-alpine AS deploy
+# Deploy stage
+FROM nginx:stable-alpine
 
 LABEL org.opencontainers.image.source="{{org.git_host}}/{{org.git_org}}/{{info.slug}}_{{service.name}}_spa"
 
-# Default Environment Variable values
-ENV API_HOST=localhost
-ENV API_PORT=8184
+ENV API_HOST={{info.slug}}_{{service.name}}_api
+ENV API_PORT={{repo.port - 1}}
 
-# Copy built assets from build stage to nginx serving directory
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
 
-# Copy startup script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# envsubst for runtime config; inject API_HOST/PORT into index.html for SPA
+RUN apk add --no-cache gettext
 
-# Expose port 80 (nginx listens on 80 inside container)
 EXPOSE 80
 
-# Start nginx with environment variable substitution
-CMD ["/start.sh"]
+# Native config: envsubst + index.html injection + nginx (no custom start script)
+CMD sh -c "envsubst '${API_HOST} ${API_PORT}' < /etc/nginx/nginx.conf.template > /tmp/nginx.conf && \
+  sed -i \"s|</head>|<script>window.API_HOST='${API_HOST}';window.API_PORT='${API_PORT}';</script></head>|\" /usr/share/nginx/html/index.html 2>/dev/null || true && \
+  exec nginx -g 'daemon off;' -c /tmp/nginx.conf"
