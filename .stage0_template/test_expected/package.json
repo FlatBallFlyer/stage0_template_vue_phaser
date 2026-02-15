@@ -16,7 +16,7 @@
     "container": "DOCKER_BUILDKIT=0 docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --build-arg SPA_UTILS_VERSION=0.1.0 -t ghcr.io/agile-learning-institute/mentorhub_sample_spa:latest .",
     "push": "docker push ghcr.io/agile-learning-institute/mentorhub_sample_spa:latest",
     "open": "open -a 'Google Chrome' 'http://localhost:8390' || google-chrome 'http://localhost:8390' || exg-open 'localhost:8390'",
-    "build-publish": "npm install --dev && npm run container && npm run push"
+    "build-publish": "npm install --include=dev && npm run container && npm run push"
   },
   "dependencies": {
     "@agile-learning-institute/mentorhub_spa_utils": "^0.1.0",
