@@ -66,6 +66,8 @@ templates:
     merge: true
   - path: "./vite.config.ts"
     merge: true
+  - path: "./cypress.config.ts" 
+    merge: true
   - path: "./src/composables/useRoles.ts"
     merge: true
   - path: "./src/router/index.ts"
