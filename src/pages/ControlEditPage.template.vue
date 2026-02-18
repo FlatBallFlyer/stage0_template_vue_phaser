@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">Edit Control</h1>
+        <h1 class="text-h4 mb-4">Edit {{item}}</h1>
       </v-col>
     </v-row>
 
@@ -12,21 +12,21 @@
       </v-col>
     </v-row>
 
-    <v-row v-else-if="control">
+    <v-row v-else-if="{{item | lower}}">
       <v-col cols="12" md="8">
         <v-card>
           <v-card-text>
             <AutoSaveField
-              :model-value="control.name"
+              :model-value="{{item | lower}}.name"
               label="Name *"
               :rules="[rules.required, rules.namePattern]"
               hint="No whitespace, max 40 characters"
               :on-save="(value: string | number) => updateField('name', String(value))"
-              automation-id="control-edit-name-input"
+              automation-id="{{item | lower}}-edit-name-input"
             />
 
             <AutoSaveField
-              :model-value="control.description || ''"
+              :model-value="{{item | lower}}.description || ''"
               label="Description"
               :rules="[rules.descriptionPattern]"
               hint="Max 255 characters, no tabs or newlines"
@@ -34,16 +34,16 @@
               class="mt-4"
               textarea
               :rows="3"
-              automation-id="control-edit-description-input"
+              automation-id="{{item | lower}}-edit-description-input"
             />
 
             <AutoSaveSelect
-              :model-value="control.status || 'active'"
+              :model-value="{{item | lower}}.status || 'active'"
               label="Status"
               :items="statusOptions"
               :on-save="(value: string) => updateField('status', value)"
               class="mt-4"
-              automation-id="control-edit-status-select"
+              automation-id="{{item | lower}}-edit-status-select"
             />
 
             <v-divider class="my-6" />
@@ -51,14 +51,14 @@
             <v-row>
               <v-col cols="12" md="6">
                 <v-text-field
-                  :model-value="formatDate(control.created.at_time)"
+                  :model-value="formatDate({{item | lower}}.created.at_time)"
                   label="Created"
                   readonly
                   variant="outlined"
                   density="compact"
                 />
                 <v-text-field
-                  :model-value="control.created.by_user"
+                  :model-value="{{item | lower}}.created.by_user"
                   label="Created By"
                   readonly
                   variant="outlined"
@@ -68,14 +68,14 @@
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
-                  :model-value="formatDate(control.saved.at_time)"
+                  :model-value="formatDate({{item | lower}}.saved.at_time)"
                   label="Last Saved"
                   readonly
                   variant="outlined"
                   density="compact"
                 />
                 <v-text-field
-                  :model-value="control.saved.by_user"
+                  :model-value="{{item | lower}}.saved.by_user"
                   label="Last Saved By"
                   readonly
                   variant="outlined"
@@ -87,9 +87,9 @@
 
             <v-card-actions class="px-0 mt-4">
               <v-btn 
-                @click="router.push('/controls')" 
+                @click="router.push('/{{item | lower}}s')" 
                 variant="text"
-                data-automation-id="control-edit-back-button"
+                data-automation-id="{{item | lower}}-edit-back-button"
               >
                 Back to List
               </v-btn>
@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 /**
- * Control Edit Page - Showcase of spa_utils AutoSave components
+ * {{item}} Edit Page - Showcase of spa_utils AutoSave components
  * 
  * This page demonstrates how easy it is to build an edit page with:
  * - Auto-save on blur (no save button needed!)
@@ -124,17 +124,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { api } from '@/api/client'
 // 🎯 All these utilities come from spa_utils - ready to use!
 import { AutoSaveField, AutoSaveSelect, validationRules, formatDate, useErrorHandler } from '@{{org.git_org}}/{{info.slug}}_spa_utils'
-import type { ControlUpdate } from '@/api/types'
+import type { {{item}}Update } from '@/api/types'
 
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
 
-const controlId = computed(() => route.params.id as string)
+const {{item | lower}}Id = computed(() => route.params.id as string)
 
-const { data: control, isLoading, error: queryError } = useQuery({
-  queryKey: ['control', controlId],
-  queryFn: () => api.getControl(controlId.value),
+const { data: {{item | lower}}, isLoading, error: queryError } = useQuery({
+  queryKey: ['{{item | lower}}', {{item | lower}}Id],
+  queryFn: () => api.get{{item}}({{item | lower}}Id.value),
 })
 
 const errorRef = ref<Error | null>(null)
@@ -153,11 +153,11 @@ const rules = {
   descriptionPattern: validationRules.descriptionPattern,
 }
 
-const { mutateAsync: updateControl } = useMutation({
-  mutationFn: (data: ControlUpdate) => api.updateControl(controlId.value, data),
+const { mutateAsync: update{{item}} } = useMutation({
+  mutationFn: (data: {{item}}Update) => api.update{{item}}({{item | lower}}Id.value, data),
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['control', controlId.value] })
-    queryClient.invalidateQueries({ queryKey: ['controls'] })
+    queryClient.invalidateQueries({ queryKey: ['{{item | lower}}', {{item | lower}}Id.value] })
+    queryClient.invalidateQueries({ queryKey: ['{{item | lower}}s'] })
     errorRef.value = null
   },
   onError: (error: Error) => {
@@ -165,9 +165,9 @@ const { mutateAsync: updateControl } = useMutation({
   },
 })
 
-async function updateField(field: keyof ControlUpdate, value: string) {
+async function updateField(field: keyof {{item}}Update, value: string) {
   try {
-    await updateControl({ [field]: value })
+    await update{{item}}({ [field]: value })
   } catch (error) {
     throw error
   }

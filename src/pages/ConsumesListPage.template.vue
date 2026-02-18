@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">Consumes</h1>
+        <h1 class="text-h4 mb-4">{{item}}s</h1>
       </v-col>
     </v-row>
 
@@ -12,7 +12,7 @@
           :searchable="true"
           :search-query="searchQuery"
           :debounced-search="debouncedSearch"
-          automation-id="consume-list-search"
+          automation-id="{{item | lower}}-list-search"
         />
       </v-col>
     </v-row>
@@ -22,9 +22,9 @@
         <v-card>
           <v-data-table
             :headers="headers"
-            :items="(consumes ?? []) as unknown as Consume[]"
+            :items="({{item | lower}}s ?? []) as unknown as {{item}}[]"
             :loading="isLoading as unknown as boolean"
-            @click:row="navigateToConsume"
+            @click:row="navigateTo{{item}}"
             hover
             :items-per-page="-1"
             hide-default-footer
@@ -59,7 +59,7 @@
               :loading="isFetchingNextPageValue"
               color="primary"
               block
-              data-automation-id="consume-list-load-more"
+              data-automation-id="{{item | lower}}-list-load-more"
             >
               {% raw %}{{ isFetchingNextPageValue ? 'Loading...' : 'Load More' }}{% endraw %}
             </v-btn>
@@ -69,14 +69,14 @@
     </v-row>
 
     <v-snackbar :model-value="showError as unknown as boolean" color="error" :timeout="5000">
-      Failed to load consumes: {% raw %}{{ errorMessage }}{% endraw %}
+      Failed to load {{item | lower}}s: {% raw %}{{ errorMessage }}{% endraw %}
     </v-snackbar>
   </v-container>
 </template>
 
 <script setup lang="ts">
 /**
- * Consumes List Page - Showcase of {{info.slug}}_spa_utils simplicity
+ * {{item}}s List Page - Showcase of {{info.slug}}_spa_utils simplicity
  * 
  * Building a list page with infinite scroll, search, and sorting
  * is as simple as calling useInfiniteScroll with your API function.
@@ -85,13 +85,13 @@ import { computed } from 'vue'
 import { api } from '@/api/client'
 import { ListPageSearch, useInfiniteScroll } from '@{{org.git_org}}/{{info.slug}}_spa_utils'
 import { useRouter } from 'vue-router'
-import type { Consume } from '@/api/types'
+import type { {{item}} } from '@/api/types'
 
 const router = useRouter()
 
 // 🎯 All list functionality in one composable call
 const {
-  items: consumes,
+  items: {{item | lower}}s,
   isLoading,
   isFetchingNextPage,
   hasMore,
@@ -104,15 +104,15 @@ const {
   order,
   setSortBy,
   setOrder,
-} = useInfiniteScroll<Consume>({
-  queryKey: ['consumes'],
-  queryFn: (params) => api.getConsumes(params),
+} = useInfiniteScroll<{{item}}>({
+  queryKey: ['{{item | lower}}s'],
+  queryFn: (params) => api.get{{item}}s(params),
   getItemId: (item) => item._id,
   limit: 20,
 })
 
-function navigateToConsume(_event: unknown, { item }: { item: Consume }) {
-  router.push(`/consumes/${item._id}`)
+function navigateTo{{item}}(_event: unknown, { item }: { item: {{item}} }) {
+  router.push(`/{{item | lower}}s/${item._id}`)
 }
 
 // Create computed properties for template use (TypeScript-friendly)

@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">View Create</h1>
+        <h1 class="text-h4 mb-4">View {{item}}</h1>
       </v-col>
     </v-row>
 
@@ -12,19 +12,19 @@
       </v-col>
     </v-row>
 
-    <v-row v-else-if="create">
+    <v-row v-else-if="{{item | lower}}">
       <v-col cols="12" md="8">
         <v-card>
           <v-card-text>
             <v-text-field
-              :model-value="create.name"
+              :model-value="{{item | lower}}.name"
               label="Name"
               readonly
               variant="outlined"
             />
 
             <v-textarea
-              :model-value="create.description || 'N/A'"
+              :model-value="{{item | lower}}.description || 'N/A'"
               label="Description"
               readonly
               variant="outlined"
@@ -33,7 +33,7 @@
             />
 
             <v-text-field
-              :model-value="create.status || 'N/A'"
+              :model-value="{{item | lower}}.status || 'N/A'"
               label="Status"
               readonly
               variant="outlined"
@@ -45,14 +45,14 @@
             <v-row>
               <v-col cols="12" md="6">
                 <v-text-field
-                  :model-value="formatDate(create.created.at_time)"
+                  :model-value="formatDate({{item | lower}}.created.at_time)"
                   label="Created"
                   readonly
                   variant="outlined"
                   density="compact"
                 />
                 <v-text-field
-                  :model-value="create.created.by_user"
+                  :model-value="{{item | lower}}.created.by_user"
                   label="Created By"
                   readonly
                   variant="outlined"
@@ -62,14 +62,14 @@
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
-                  :model-value="create.created.from_ip"
+                  :model-value="{{item | lower}}.created.from_ip"
                   label="From IP"
                   readonly
                   variant="outlined"
                   density="compact"
                 />
                 <v-text-field
-                  :model-value="create.created.correlation_id"
+                  :model-value="{{item | lower}}.created.correlation_id"
                   label="Correlation ID"
                   readonly
                   variant="outlined"
@@ -80,7 +80,7 @@
             </v-row>
 
             <v-card-actions class="px-0 mt-4">
-              <v-btn @click="router.push('/creates')" variant="text">
+              <v-btn @click="router.push('/{{item | lower}}s')" variant="text">
                 Back to List
               </v-btn>
             </v-card-actions>
@@ -105,11 +105,11 @@ import { api } from '@/api/client'
 const route = useRoute()
 const router = useRouter()
 
-const createId = computed(() => route.params.id as string)
+const {{item | lower}}Id = computed(() => route.params.id as string)
 
-const { data: create, isLoading, error: queryError } = useQuery({
-  queryKey: ['create', createId],
-  queryFn: () => api.getCreate(createId.value),
+const { data: {{item | lower}}, isLoading, error: queryError } = useQuery({
+  queryKey: ['{{item | lower}}', {{item | lower}}Id],
+  queryFn: () => api.get{{item}}({{item | lower}}Id.value),
 })
 
 const errorRef = ref<Error | null>(null)

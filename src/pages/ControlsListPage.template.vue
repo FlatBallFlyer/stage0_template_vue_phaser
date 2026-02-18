@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">Controls</h1>
+        <h1 class="text-h4 mb-4">{{item}}s</h1>
       </v-col>
     </v-row>
 
@@ -12,17 +12,17 @@
           :searchable="true"
           :search-query="searchQuery"
           :debounced-search="debouncedSearch"
-          automation-id="control-list-search"
+          automation-id="{{item | lower}}-list-search"
         />
       </v-col>
       <v-col cols="12" md="6" class="d-flex justify-end align-center">
         <v-btn 
           color="primary" 
-          to="/controls/new"
-          data-automation-id="control-list-new-button"
+          to="/{{item | lower}}s/new"
+          data-automation-id="{{item | lower}}-list-new-button"
         >
           <v-icon left>mdi-plus</v-icon>
-          New Control
+          New {{item}}
         </v-btn>
       </v-col>
     </v-row>
@@ -32,9 +32,9 @@
         <v-card>
           <v-data-table
             :headers="headers"
-            :items="(controls ?? []) as unknown as Control[]"
+            :items="({{item | lower}}s ?? []) as unknown as {{item}}[]"
             :loading="isLoading as unknown as boolean"
-            @click:row="navigateToControl"
+            @click:row="navigateTo{{item}}"
             hover
             :items-per-page="-1"
             hide-default-footer
@@ -94,7 +94,7 @@
               :loading="isFetchingNextPageValue"
               color="primary"
               block
-              data-automation-id="control-list-load-more"
+              data-automation-id="{{item | lower}}-list-load-more"
             >
               {% raw %}{{ isFetchingNextPageValue ? 'Loading...' : 'Load More' }}{% endraw %}
             </v-btn>
@@ -104,14 +104,14 @@
     </v-row>
 
     <v-snackbar :model-value="showError as unknown as boolean" color="error" :timeout="5000">
-      Failed to load controls: {% raw %}{{ errorMessage }}{% endraw %}
+      Failed to load {{item | lower}}s: {% raw %}{{ errorMessage }}{% endraw %}
     </v-snackbar>
   </v-container>
 </template>
 
 <script setup lang="ts">
 /**
- * Controls List Page - Showcase of {{info.slug}}_spa_utils ease of use
+ * {{item}}s List Page - Showcase of {{info.slug}}_spa_utils ease of use
  * 
  * This page demonstrates how easy it is to build a feature-rich list page with:
  * - Infinite scroll pagination
@@ -127,7 +127,7 @@ import { computed } from 'vue'
 import { api } from '@/api/client'
 import { formatDate, ListPageSearch, useInfiniteScroll } from '@{{org.git_org}}/{{info.slug}}_spa_utils'
 import { useRouter } from 'vue-router'
-import type { Control } from '@/api/types'
+import type { {{item}} } from '@/api/types'
 
 const router = useRouter()
 
@@ -141,7 +141,7 @@ const router = useRouter()
 // - searchQuery/debouncedSearch: Search with automatic 300ms debouncing
 // - sortBy/order/setSortBy/setOrder: Server-side sorting
 const {
-  items: controls,
+  items: {{item | lower}}s,
   isLoading,
   isFetchingNextPage,
   hasMore,
@@ -154,16 +154,16 @@ const {
   order,
   setSortBy,
   setOrder,
-} = useInfiniteScroll<Control>({
-  queryKey: ['controls'],
-  queryFn: (params) => api.getControls(params),
+} = useInfiniteScroll<{{item}}>({
+  queryKey: ['{{item | lower}}s'],
+  queryFn: (params) => api.get{{item}}s(params),
   getItemId: (item) => item._id,
   limit: 20,
 })
 
 // Simple navigation handler
-function navigateToControl(_event: unknown, { item }: { item: Control }) {
-  router.push(`/controls/${item._id}`)
+function navigateTo{{item}}(_event: unknown, { item }: { item: {{item}} }) {
+  router.push(`/{{item | lower}}s/${item._id}`)
 }
 
 // Create computed properties for template use (TypeScript-friendly)

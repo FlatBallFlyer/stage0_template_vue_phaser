@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">Creates</h1>
+        <h1 class="text-h4 mb-4">{{item}}s</h1>
       </v-col>
     </v-row>
 
@@ -12,17 +12,17 @@
           :searchable="true"
           :search-query="searchQuery"
           :debounced-search="debouncedSearch"
-          automation-id="create-list-search"
+          automation-id="{{item | lower}}-list-search"
         />
       </v-col>
       <v-col cols="12" md="6" class="d-flex justify-end align-center">
         <v-btn 
           color="primary" 
-          to="/creates/new"
-          data-automation-id="create-list-new-button"
+          to="/{{item | lower}}s/new"
+          data-automation-id="{{item | lower}}-list-new-button"
         >
           <v-icon left>mdi-plus</v-icon>
-          New Create
+          New {{item}}
         </v-btn>
       </v-col>
     </v-row>
@@ -32,9 +32,9 @@
         <v-card>
           <v-data-table
             :headers="headers"
-            :items="(creates ?? []) as unknown as Create[]"
+            :items="({{item | lower}}s ?? []) as unknown as {{item}}[]"
             :loading="isLoading as unknown as boolean"
-            @click:row="navigateToCreate"
+            @click:row="navigateTo{{item}}"
             hover
             :items-per-page="-1"
             hide-default-footer
@@ -80,7 +80,7 @@
               :loading="isFetchingNextPageValue"
               color="primary"
               block
-              data-automation-id="create-list-load-more"
+              data-automation-id="{{item | lower}}-list-load-more"
             >
               {% raw %}{{ isFetchingNextPageValue ? 'Loading...' : 'Load More' }}{% endraw %}
             </v-btn>
@@ -90,14 +90,14 @@
     </v-row>
 
     <v-snackbar :model-value="showError as unknown as boolean" color="error" :timeout="5000">
-      Failed to load creates: {% raw %}{{ errorMessage }}{% endraw %}
+      Failed to load {{item | lower}}s: {% raw %}{{ errorMessage }}{% endraw %}
     </v-snackbar>
   </v-container>
 </template>
 
 <script setup lang="ts">
 /**
- * Creates List Page - Powered by {{info.slug}}_spa_utils
+ * {{item}}s List Page - Powered by {{info.slug}}_spa_utils
  * 
  * This page uses useInfiniteScroll from @{{org.git_org}}/{{info.slug}}_spa_utils
  * to get infinite scroll, search, and sorting with minimal code.
@@ -106,13 +106,13 @@ import { computed } from 'vue'
 import { api } from '@/api/client'
 import { formatDate, ListPageSearch, useInfiniteScroll } from '@{{org.git_org}}/{{info.slug}}_spa_utils'
 import { useRouter } from 'vue-router'
-import type { Create } from '@/api/types'
+import type { {{item}} } from '@/api/types'
 
 const router = useRouter()
 
 // 🎯 Single composable provides all list functionality
 const {
-  items: creates,
+  items: {{item | lower}}s,
   isLoading,
   isFetchingNextPage,
   hasMore,
@@ -125,15 +125,15 @@ const {
   order,
   setSortBy,
   setOrder,
-} = useInfiniteScroll<Create>({
-  queryKey: ['creates'],
-  queryFn: (params) => api.getCreates(params),
+} = useInfiniteScroll<{{item}}>({
+  queryKey: ['{{item | lower}}s'],
+  queryFn: (params) => api.get{{item}}s(params),
   getItemId: (item) => item._id,
   limit: 20,
 })
 
-function navigateToCreate(_event: unknown, { item }: { item: Create }) {
-  router.push(`/creates/${item._id}`)
+function navigateTo{{item}}(_event: unknown, { item }: { item: {{item}} }) {
+  router.push(`/{{item | lower}}s/${item._id}`)
 }
 
 // Create computed properties for template use (TypeScript-friendly)

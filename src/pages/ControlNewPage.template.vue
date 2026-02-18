@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">New Control</h1>
+        <h1 class="text-h4 mb-4">New {{item}}</h1>
       </v-col>
     </v-row>
 
@@ -18,7 +18,7 @@
                 hint="No whitespace, max 40 characters"
                 persistent-hint
                 required
-                data-automation-id="control-new-name-input"
+                data-automation-id="{{item | lower}}-new-name-input"
               />
 
               <v-textarea
@@ -29,7 +29,7 @@
                 persistent-hint
                 rows="3"
                 class="mt-4"
-                data-automation-id="control-new-description-input"
+                data-automation-id="{{item | lower}}-new-description-input"
               />
 
               <v-select
@@ -37,14 +37,14 @@
                 label="Status"
                 :items="statusOptions"
                 class="mt-4"
-                data-automation-id="control-new-status-select"
+                data-automation-id="{{item | lower}}-new-status-select"
               />
 
               <v-card-actions class="px-0 mt-4">
                 <v-btn 
                   @click="router.back()" 
                   variant="text"
-                  data-automation-id="control-new-cancel-button"
+                  data-automation-id="{{item | lower}}-new-cancel-button"
                 >
                   Cancel
                 </v-btn>
@@ -54,9 +54,9 @@
                   color="primary"
                   :loading="isPending"
                   :disabled="isPending"
-                  data-automation-id="control-new-submit-button"
+                  data-automation-id="{{item | lower}}-new-submit-button"
                 >
-                  Create Control
+                  Create {{item}}
                 </v-btn>
               </v-card-actions>
             </v-form>
@@ -77,7 +77,7 @@ import { useRouter } from 'vue-router'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { api } from '@/api/client'
 import { validationRules, useErrorHandler } from '@{{org.git_org}}/{{info.slug}}_spa_utils'
-import type { ControlInput } from '@/api/types'
+import type { {{item}}Input } from '@/api/types'
 
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -85,7 +85,7 @@ const formRef = ref()
 const errorRef = ref<Error | null>(null)
 const { showError, errorMessage } = useErrorHandler(errorRef as any)
 
-const form = ref<ControlInput>({
+const form = ref<{{item}}Input>({
   name: '',
   description: '',
   status: 'active',
@@ -99,11 +99,11 @@ const rules = {
   descriptionPattern: validationRules.descriptionPattern,
 }
 
-const { mutate: createControl, isPending } = useMutation({
-  mutationFn: (data: ControlInput) => api.createControl(data),
+const { mutate: create{{item}}, isPending } = useMutation({
+  mutationFn: (data: {{item}}Input) => api.create{{item}}(data),
   onSuccess: (response) => {
-    queryClient.invalidateQueries({ queryKey: ['controls'] })
-    router.push(`/controls/${response._id}`)
+    queryClient.invalidateQueries({ queryKey: ['{{item | lower}}s'] })
+    router.push(`/{{item | lower}}s/${response._id}`)
     errorRef.value = null
   },
   onError: (error: Error) => {
@@ -114,7 +114,7 @@ const { mutate: createControl, isPending } = useMutation({
 async function handleSubmit() {
   const { valid } = await formRef.value.validate()
   if (valid) {
-    createControl(form.value)
+    create{{item}}(form.value)
   }
 }
 </script>

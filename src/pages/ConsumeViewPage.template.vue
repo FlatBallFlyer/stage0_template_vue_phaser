@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1 class="text-h4 mb-4">View Consume</h1>
+        <h1 class="text-h4 mb-4">View {{item}}</h1>
       </v-col>
     </v-row>
 
@@ -12,19 +12,19 @@
       </v-col>
     </v-row>
 
-    <v-row v-else-if="consume">
+    <v-row v-else-if="{{item | lower}}">
       <v-col cols="12" md="8">
         <v-card>
           <v-card-text>
             <v-text-field
-              :model-value="consume.name"
+              :model-value="{{item | lower}}.name"
               label="Name"
               readonly
               variant="outlined"
             />
 
             <v-textarea
-              :model-value="consume.description || 'N/A'"
+              :model-value="{{item | lower}}.description || 'N/A'"
               label="Description"
               readonly
               variant="outlined"
@@ -33,7 +33,7 @@
             />
 
             <v-text-field
-              :model-value="consume.status || 'N/A'"
+              :model-value="{{item | lower}}.status || 'N/A'"
               label="Status"
               readonly
               variant="outlined"
@@ -41,7 +41,7 @@
             />
 
             <v-card-actions class="px-0 mt-4">
-              <v-btn @click="router.push('/consumes')" variant="text">
+              <v-btn @click="router.push('/{{item | lower}}s')" variant="text">
                 Back to List
               </v-btn>
             </v-card-actions>
@@ -66,11 +66,11 @@ import { api } from '@/api/client'
 const route = useRoute()
 const router = useRouter()
 
-const consumeId = computed(() => route.params.id as string)
+const {{item | lower}}Id = computed(() => route.params.id as string)
 
-const { data: consume, isLoading, error: queryError } = useQuery({
-  queryKey: ['consume', consumeId],
-  queryFn: () => api.getConsume(consumeId.value),
+const { data: {{item | lower}}, isLoading, error: queryError } = useQuery({
+  queryKey: ['{{item | lower}}', {{item | lower}}Id],
+  queryFn: () => api.get{{item}}({{item | lower}}Id.value),
 })
 
 const errorRef = ref<Error | null>(null)
