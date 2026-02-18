@@ -1,4 +1,4 @@
-describe('Consume Domain', () => {
+describe('{{ item }} Domain', () => {
   beforeEach(() => {
     cy.login()
   })
