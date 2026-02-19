@@ -7,7 +7,7 @@
         data-automation-id="nav-drawer-toggle"
         aria-label="Open navigation drawer"
       />
-      <v-app-bar-title>Template SPA</v-app-bar-title>
+      <v-app-bar-title>Sample</v-app-bar-title>
     </v-app-bar>
 
     <v-navigation-drawer

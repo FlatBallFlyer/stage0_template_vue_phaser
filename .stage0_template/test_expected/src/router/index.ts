@@ -101,4 +101,8 @@ router.beforeEach((to, _from, next) => {
   next()
 })
 
+router.afterEach((to) => {
+  document.title = to.path === '/login' ? 'Mentor Hub Login' : 'Sample'
+})
+
 export default router

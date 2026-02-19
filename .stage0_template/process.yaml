@@ -55,6 +55,8 @@ templates:
   - path: "./README.md.template"
     output: "./README.md"
     merge: true
+  - path: "./index.html"
+    merge: true
   - path: "./Makefile"
     output: "/dev/null"
     merge: true

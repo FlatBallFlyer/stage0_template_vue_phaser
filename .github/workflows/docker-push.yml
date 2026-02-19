@@ -41,4 +41,3 @@ jobs:
           tags: {{org.docker_host}}/{{org.docker_org}}/{{info.slug}}_{{service.name}}_spa:latest
           build-args: |
             GITHUB_TOKEN={% raw %}${{ secrets.GH_PAT }}{% endraw %}
-            SPA_UTILS_VERSION=0.2.0

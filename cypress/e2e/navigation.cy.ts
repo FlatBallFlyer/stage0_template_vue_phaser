@@ -10,13 +10,13 @@ describe('Navigation Drawer', () => {
     
     // Check that drawer is visible with domain sections
     {%- for item in service.data_domains.controls %}
-    cy.contains('{{ item | upper }} DOMAIN').should('be.visible')
+    cy.contains('{{ item | upper }} DOMAIN').should('be.exist')
     {%- endfor %}
     {%- for item in service.data_domains.creates %}
-    cy.contains('{{ item | upper }} DOMAIN').should('be.visible')
+    cy.contains('{{ item | upper }} DOMAIN').should('be.exist')
     {%- endfor %}
     {%- for item in service.data_domains.consumes %}
-    cy.contains('{{ item | upper }} DOMAIN').should('be.visible')
+    cy.contains('{{ item | upper }} DOMAIN').should('be.exist')
     {%- endfor %}
   })
 

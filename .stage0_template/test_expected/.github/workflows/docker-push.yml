@@ -41,4 +41,3 @@ jobs:
           tags: ghcr.io/agile-learning-institute/mentorhub_sample_spa:latest
           build-args: |
             GITHUB_TOKEN=${{ secrets.GH_PAT }}
-            SPA_UTILS_VERSION=0.2.0

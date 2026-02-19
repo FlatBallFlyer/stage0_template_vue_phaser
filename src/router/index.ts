@@ -101,4 +101,8 @@ router.beforeEach((to, _from, next) => {
   next()
 })
 
+router.afterEach((to) => {
+  document.title = to.path === '/login' ? '{{info.name}} Login' : '{{service.name | capitalize}}'
+})
+
 export default router

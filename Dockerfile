@@ -10,10 +10,6 @@ ARG GITHUB_TOKEN
 RUN echo "@{{org.git_org}}:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
-# Pin spa_utils version for reproducible builds
-ARG SPA_UTILS_VERSION=0.1.0
-RUN sed -i "s|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"[^\"]*\"|\"@{{org.git_org}}/{{info.slug}}_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" package.json
-
 RUN npm install
 
 COPY . .

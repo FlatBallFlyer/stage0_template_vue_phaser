@@ -10,10 +10,6 @@ ARG GITHUB_TOKEN
 RUN echo "@agile-learning-institute:registry=https://npm.pkg.github.com" > .npmrc && \
     echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc
 
-# Pin spa_utils version for reproducible builds
-ARG SPA_UTILS_VERSION=0.1.0
-RUN sed -i "s|\"@agile-learning-institute/mentorhub_spa_utils\": \"[^\"]*\"|\"@agile-learning-institute/mentorhub_spa_utils\": \"${SPA_UTILS_VERSION}\"|g" package.json
-
 RUN npm install
 
 COPY . .
