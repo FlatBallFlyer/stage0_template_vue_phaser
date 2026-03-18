@@ -32,5 +32,9 @@ dist-ssr
 cypress/videos
 cypress/screenshots
 
+# Playwright
+playwright-report/
+test-results/
+
 # Test coverage
 coverage
