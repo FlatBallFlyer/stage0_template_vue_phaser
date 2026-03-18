@@ -1,25 +1,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { api } from './client'
-import type { CreateInput } from './types'
+import type { EventInput } from './types'
 
-// Mock fetch globally
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 
-describe('API Client - Create Endpoints', () => {
+describe('API Client - Event Endpoints', () => {
   beforeEach(() => {
     mockFetch.mockClear()
     localStorage.clear()
     localStorage.setItem('access_token', 'test-token')
   })
 
-  it('should get all creates', async () => {
-    const mockCreates = [
+  it('should get all events', async () => {
+    const mockEvents = [
       {
         _id: '507f1f77bcf86cd799439011',
-        name: 'test-create',
-        description: 'Test description',
-        status: 'active',
+        name: 'move',
         created: {
           from_ip: '127.0.0.1',
           by_user: 'user1',
@@ -28,13 +25,7 @@ describe('API Client - Create Endpoints', () => {
         }
       }
     ]
-
-    const mockResponse = {
-      items: mockCreates,
-      limit: 20,
-      has_more: false,
-      next_cursor: null
-    }
+    const mockResponse = { items: mockEvents, limit: 20, has_more: false, next_cursor: null }
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -43,15 +34,15 @@ describe('API Client - Create Endpoints', () => {
       json: async () => mockResponse
     })
 
-    const result = await api.getCreates()
-
+    const result = await api.getEvents()
     expect(result).toEqual(mockResponse)
+    expect(mockFetch).toHaveBeenCalledWith('/api/event', expect.any(Object))
   })
 
-  it('should get a single create', async () => {
-    const mockCreate = {
+  it('should get a single event', async () => {
+    const mockEvent = {
       _id: '507f1f77bcf86cd799439011',
-      name: 'test-create',
+      name: 'jump',
       created: {
         from_ip: '127.0.0.1',
         by_user: 'user1',
@@ -64,21 +55,15 @@ describe('API Client - Create Endpoints', () => {
       ok: true,
       status: 200,
       headers: { get: (name: string) => name === 'content-length' ? '100' : null },
-      json: async () => mockCreate
+      json: async () => mockEvent
     })
 
-    const result = await api.getCreate('507f1f77bcf86cd799439011')
-
-    expect(result).toEqual(mockCreate)
+    const result = await api.getEvent('507f1f77bcf86cd799439011')
+    expect(result).toEqual(mockEvent)
   })
 
-  it('should create a create', async () => {
-    const input: CreateInput = {
-      name: 'new-create',
-      description: 'New description',
-      status: 'active'
-    }
-
+  it('should create an event (player_id + name slug)', async () => {
+    const input: EventInput = { player_id: 'player-123', name: 'move' }
     const mockResponse = { _id: '507f1f77bcf86cd799439011' }
 
     mockFetch.mockResolvedValueOnce({
@@ -88,11 +73,10 @@ describe('API Client - Create Endpoints', () => {
       json: async () => mockResponse
     })
 
-    const result = await api.createCreate(input)
-
+    const result = await api.createEvent(input)
     expect(result).toEqual(mockResponse)
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/create',
+      '/api/event',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify(input)

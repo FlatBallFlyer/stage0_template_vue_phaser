@@ -1,4 +1,4 @@
-// Type definitions based on OpenAPI spec
+// Type definitions based on OpenAPI spec (Game / Event / Player)
 
 export interface Error {
   error: string
@@ -11,9 +11,8 @@ export interface Breadcrumb {
   correlation_id: string
 }
 
-
-// Control Domain
-export interface Control {
+// Game Domain (progress, sessions)
+export interface Game {
   _id: string
   name: string
   description?: string
@@ -22,21 +21,20 @@ export interface Control {
   saved: Breadcrumb
 }
 
-export interface ControlInput {
+export interface GameInput {
   name: string
   description?: string
   status?: 'active' | 'archived'
 }
 
-export interface ControlUpdate {
+export interface GameUpdate {
   name?: string
   description?: string
   status?: 'active' | 'archived'
 }
 
-
-// Create Domain
-export interface Create {
+// Event Domain (fine-grained gameplay events; POST body: player_id + name slug)
+export interface Event {
   _id: string
   name: string
   description?: string
@@ -44,21 +42,19 @@ export interface Create {
   created: Breadcrumb
 }
 
-export interface CreateInput {
+/** POST /event body: name is a non-unique one-word slug (e.g. move, jump) */
+export interface EventInput {
+  player_id: string
   name: string
-  description?: string
-  status?: string
 }
 
-
-// Consume Domain
-export interface Consume {
+// Player Domain
+export interface Player {
   _id: string
   name: string
   description?: string
   status?: string
 }
-
 
 // Authentication
 export interface DevLoginRequest {
@@ -74,13 +70,13 @@ export interface DevLoginResponse {
   roles: string[]
 }
 
-// Configuration
+// Configuration (playerId from config.token.user_id)
 export interface ConfigResponse {
   config_items: unknown[]
   versions: unknown[]
   enumerators: unknown[]
   token?: {
-    claims?: Record<string, unknown>
+    claims?: Record<string, unknown> // user_id for playerId
   }
 }
 

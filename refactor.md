@@ -227,7 +227,7 @@ Decisions in §6 are recorded; the refactor can be completed per this plan.
 | Step | Status    | Commit / notes |
 |------|-----------|----------------|
 | (pre) | ✅ Done | Initial commit: refactor plan + README E2E/Playwright updates |
-| 1. Types and API | Pending | |
+| 1. Types and API | ✅ Done | types.ts + client.ts Game/Event/Player; GET /game + GET /game/:id; EventInput { player_id, name }; unit tests updated |
 | 2. Router + App | Pending | |
 | 3. Game page scaffold | Pending | |
 | 4. API-driven gameplay | Pending | |

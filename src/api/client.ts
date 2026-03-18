@@ -1,14 +1,11 @@
-import type { 
-  Control,
-  ControlInput,
-  ControlUpdate,
-
-  Create,
-  CreateInput,
-
-  Consume,
-
-  DevLoginRequest, 
+import type {
+  Game,
+  GameInput,
+  GameUpdate,
+  Event,
+  EventInput,
+  Player,
+  DevLoginRequest,
   DevLoginResponse,
   ConfigResponse,
   Error,
@@ -38,12 +35,12 @@ async function request<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = localStorage.getItem('access_token')
-  
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   }
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
@@ -60,15 +57,14 @@ async function request<T>(
     } catch {
       // Ignore JSON parse errors
     }
-    
+
     // Handle 401 Unauthorized - clear invalid token and redirect to login
     if (response.status === 401) {
       localStorage.removeItem('access_token')
       localStorage.removeItem('token_expires_at')
-      // Redirect to login page, preserving current path for post-login redirect
       window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
     }
-    
+
     throw new ApiError(
       errorData?.error || `HTTP ${response.status}: ${response.statusText}`,
       response.status,
@@ -89,11 +85,11 @@ export const api = {
   async devLogin(payload?: DevLoginRequest): Promise<DevLoginResponse> {
     const url = getDevLoginUrl()
     const token = localStorage.getItem('access_token')
-    
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     }
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -121,93 +117,87 @@ export const api = {
     return response.json()
   },
 
-  // Config
+  // Config (playerId = config.token.user_id)
   async getConfig(): Promise<ConfigResponse> {
     return request<ConfigResponse>('/config')
   },
 
-  // Control endpoints
-  // 🎯 API methods use InfiniteScrollParams and InfiniteScrollResponse types
-  // These types are compatible with spa_utils useInfiniteScroll composable
-
-  async getControls(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Control>> {
+  // Game endpoints
+  // GET /game returns user's most recent game; GET /game/:id for specific game (e.g. launch by another microservice)
+  async getGames(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Game>> {
     const queryParams = new URLSearchParams()
     if (params?.name) queryParams.append('name', params.name)
     if (params?.after_id) queryParams.append('after_id', params.after_id)
     if (params?.limit) queryParams.append('limit', String(params.limit))
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by)
     if (params?.order) queryParams.append('order', params.order)
-    
+
     const query = queryParams.toString()
-    return request<InfiniteScrollResponse<Control>>(`/control${query ? `?${query}` : ''}`)
+    return request<InfiniteScrollResponse<Game>>(`/game${query ? `?${query}` : ''}`)
   },
 
-  async getControl(controlId: string): Promise<Control> {
-    return request<Control>(`/control/${controlId}`)
+  /** Get most recent game (no id) or specific game by id */
+  async getGame(gameId?: string): Promise<Game> {
+    if (gameId) {
+      return request<Game>(`/game/${gameId}`)
+    }
+    return request<Game>('/game')
   },
 
-  async createControl(data: ControlInput): Promise<{ _id: string }> {
-    return request<{ _id: string }>('/control', {
+  async createGame(data: GameInput): Promise<{ _id: string }> {
+    return request<{ _id: string }>('/game', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   },
 
-  async updateControl(controlId: string, data: ControlUpdate): Promise<Control> {
-    return request<Control>(`/control/${controlId}`, {
+  async updateGame(gameId: string, data: GameUpdate): Promise<Game> {
+    return request<Game>(`/game/${gameId}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     })
   },
 
-
-
-  // Create endpoints
-
-  async getCreates(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Create>> {
+  // Event endpoints (fine-grained: name = one-word slug, e.g. move, jump)
+  async getEvents(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Event>> {
     const queryParams = new URLSearchParams()
     if (params?.name) queryParams.append('name', params.name)
     if (params?.after_id) queryParams.append('after_id', params.after_id)
     if (params?.limit) queryParams.append('limit', String(params.limit))
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by)
     if (params?.order) queryParams.append('order', params.order)
-    
+
     const query = queryParams.toString()
-    return request<InfiniteScrollResponse<Create>>(`/create${query ? `?${query}` : ''}`)
+    return request<InfiniteScrollResponse<Event>>(`/event${query ? `?${query}` : ''}`)
   },
 
-  async getCreate(createId: string): Promise<Create> {
-    return request<Create>(`/create/${createId}`)
+  async getEvent(eventId: string): Promise<Event> {
+    return request<Event>(`/event/${eventId}`)
   },
 
-  async createCreate(data: CreateInput): Promise<{ _id: string }> {
-    return request<{ _id: string }>('/create', {
+  async createEvent(data: EventInput): Promise<{ _id: string }> {
+    return request<{ _id: string }>('/event', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   },
 
-
-
-  // Consume endpoints
-
-  async getConsumes(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Consume>> {
+  // Player endpoints
+  async getPlayers(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Player>> {
     const queryParams = new URLSearchParams()
     if (params?.name) queryParams.append('name', params.name)
     if (params?.after_id) queryParams.append('after_id', params.after_id)
     if (params?.limit) queryParams.append('limit', String(params.limit))
     if (params?.sort_by) queryParams.append('sort_by', params.sort_by)
     if (params?.order) queryParams.append('order', params.order)
-    
+
     const query = queryParams.toString()
-    return request<InfiniteScrollResponse<Consume>>(`/consume${query ? `?${query}` : ''}`)
+    return request<InfiniteScrollResponse<Player>>(`/player${query ? `?${query}` : ''}`)
   },
 
-  async getConsume(consumeId: string): Promise<Consume> {
-    return request<Consume>(`/consume/${consumeId}`)
+  async getPlayer(playerId: string): Promise<Player> {
+    return request<Player>(`/player/${playerId}`)
   },
-
-
 }
 
 export { ApiError }
