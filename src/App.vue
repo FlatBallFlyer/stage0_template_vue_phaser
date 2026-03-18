@@ -7,7 +7,7 @@
         data-automation-id="nav-drawer-toggle"
         aria-label="Open navigation drawer"
       />
-      <v-app-bar-title>{{service.name | capitalize}}</v-app-bar-title>
+      <v-app-bar-title>Sample</v-app-bar-title>
     </v-app-bar>
 
     <v-navigation-drawer
@@ -16,49 +16,49 @@
       temporary
     >
       <v-list density="compact" nav>
-        {% for item in service.data_domains.controls %}
-        <v-list-subheader>{{ item | upper }} DOMAIN</v-list-subheader>
+        
+        <v-list-subheader>CONTROL DOMAIN</v-list-subheader>
         <v-list-item
-          to="/{{ item | lower }}s"
+          to="/controls"
           prepend-icon="mdi-view-list"
-          title="List {{ item }}s"
-          data-automation-id="nav-{{ item | lower }}s-list-link"
+          title="List Controls"
+          data-automation-id="nav-controls-list-link"
         />
         <v-list-item
-          to="/{{ item | lower }}s/new"
+          to="/controls/new"
           prepend-icon="mdi-plus"
-          title="New {{ item }}"
-          data-automation-id="nav-{{ item | lower }}s-new-link"
+          title="New Control"
+          data-automation-id="nav-controls-new-link"
         />
 
         <v-divider class="my-2" />
-        {% endfor %}
-        {% for item in service.data_domains.creates %}
-        <v-list-subheader>{{ item | upper }} DOMAIN</v-list-subheader>
+        
+        
+        <v-list-subheader>CREATE DOMAIN</v-list-subheader>
         <v-list-item
-          to="/{{ item | lower }}s"
+          to="/creates"
           prepend-icon="mdi-view-list"
-          title="List {{ item }}s"
-          data-automation-id="nav-{{ item | lower }}s-list-link"
+          title="List Creates"
+          data-automation-id="nav-creates-list-link"
         />
         <v-list-item
-          to="/{{ item | lower }}s/new"
+          to="/creates/new"
           prepend-icon="mdi-plus"
-          title="New {{ item }}"
-          data-automation-id="nav-{{ item | lower }}s-new-link"
+          title="New Create"
+          data-automation-id="nav-creates-new-link"
         />
 
         <v-divider class="my-2" />
-        {% endfor %}
-        {% for item in service.data_domains.consumes %}
-        <v-list-subheader>{{ item | upper }} DOMAIN</v-list-subheader>
+        
+        
+        <v-list-subheader>CONSUME DOMAIN</v-list-subheader>
         <v-list-item
-          to="/{{ item | lower }}s"
+          to="/consumes"
           prepend-icon="mdi-view-list"
-          title="List {{ item }}s"
-          data-automation-id="nav-{{ item | lower }}s-list-link"
+          title="List Consumes"
+          data-automation-id="nav-consumes-list-link"
         />
-        {% endfor %}
+        
       </v-list>
 
       <template v-slot:append>
