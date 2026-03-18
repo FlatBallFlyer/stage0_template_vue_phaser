@@ -62,9 +62,9 @@ UI scope change: keep **only** the login support, the **admin** route, and a **f
 
 - Imports: use new type names.
 - **Game**:
-  - `GET /game` — returns the user’s **most recent game** (default for `/play`).
+  - **Placeholder “my game”**: `GET /game?name={user_id}` (list endpoint); app picks the **latest** game from `items` (e.g. `sort_by=created.at_time`, `order=desc`, take first). Not final; working placeholder.
   - `GET /game/:game_id` — load a specific game (used when launched with `game_id`, e.g. by another microservice in production).
-  - `getGames`, `getGame(id?)`, `createGame`, `updateGame` (patch for progress).
+  - `getGames(params)`, `getGame(id)`, `createGame`, `updateGame` (patch for progress).
 - **Event**:
   - `POST /event` with body `{ player_id, name }`; `createEvent(payload)`.
 - **Player**:
@@ -73,7 +73,7 @@ UI scope change: keep **only** the login support, the **admin** route, and a **f
 **ID resolution**
 
 - **playerId** = `config.token.user_id` (from config response / token).
-- **gameId**: from `GET /game` (most recent) or route param `/play/:game_id`.
+- **gameId**: from `getGames({ name: playerId })` then pick latest from items, or from route param `/play/:game_id` and `getGame(game_id)`.
 
 ### 3.3 Pages (minimal UI)
 
@@ -234,3 +234,52 @@ Decisions in §6 are recorded; the refactor can be completed per this plan.
 | 5. E2E (Cypress + Playwright) | ✅ Done | Cypress: navigation.cy.ts (login redirect, /play, game container, admin, logout); removed control/create/consume; Playwright: tests/e2e/game-loads.spec.ts (redirect, container+canvas with mocked API); test:e2e:game script |
 | 6. README and branding | ✅ Done | README as-built: Game/Event/Player API, routes, Phaser flow, E2E (Cypress + Playwright link); app title Game |
 | 7. Cleanup | ✅ Done | Vitest exclude tests/e2e so Playwright specs not run as unit tests; unit tests 61 pass |
+
+**Post-refactor change:** “Get my game” flow updated to a **placeholder**: use `GET /game?name={user_id}` (list endpoint) and pick the latest from `items` (sort by `created.at_time` desc). See §3.2 and README. Not final; replace with a dedicated “current game” endpoint or backend contract when ready.
+
+---
+
+## 9. Final notes
+
+- **Scope:** This repo is the **refactored Vue Phaser game template**. It is no longer the generic Control/Create/Consume sample; it is a minimal game SPA (Login, Admin, full-screen Game) with Phaser 3 and Game/Event/Player API.
+- **Placeholders:**  
+  - “My game” is resolved via `getGames({ name: config.token.user_id })` and taking the latest item; backend is expected to support filtering (and ideally sort) by `name`.  
+  - Game progress is stored in existing fields (e.g. `description` for demo); add minimal fields as needed and document in README.
+- **Dependencies:** `phaser` ^3.80; `@agile-learning-institute/mentorhub_spa_utils`; Cypress; Playwright (`@playwright/test`). Vitest excludes `tests/e2e/**` so Playwright specs are not run as unit tests.
+- **E2E:** Cypress for login/redirect/admin; Playwright for game screen (container + canvas, with mocked API). Run Playwright with `npm run test:e2e:game` (dev server started automatically when not in CI).
+- **Backend contract:** Backend must expose `/api/game`, `/api/event`, `/api/player` and `/api/config` with `token.claims.user_id` (or equivalent) for playerId. Event POST body is `{ player_id, name }` (name = one-word slug).
+
+---
+
+## 10. Summary for merge template-refactor (next agent)
+
+Use this section when **merging this refactored template** into a product repo or when another agent runs a “template-refactor” merge (e.g. from an umbrella or runbook that applies the vue_phaser template).
+
+**What this codebase is**
+
+- **Vue 3 + Vite + Vuetify + Phaser 3** SPA with only three entry points: **Login**, **Admin**, **Game** (full-screen Phaser).
+- **Domains:** Game, Event, Player (replacing Control, Create, Consume). API paths: `/api/game`, `/api/event`, `/api/player`.
+- **Routes:** `/`, `/login`, `/play`, `/play/:game_id`, `/admin`. No CRUD list/new/edit pages; no navigation drawer.
+- **Game flow:** GamePage loads config → playerId from `config.token.user_id`; loads “my game” via `getGames({ name: playerId })` and picks latest (placeholder); loads player; passes `apiContext` into Phaser; MainScene records events and throttled progress updates.
+
+**What to preserve during a merge**
+
+- Keep **LoginPage**, **AdminPage**, **GamePage** and the **router** (/, /login, /play, /play/:game_id, /admin).
+- Keep **src/game/** (bootstrap, apiContext, scenes) and the **api** layer (Game/Event/Player types and client).
+- Keep **Cypress** for non-game flows and **Playwright** for the game-loads test; **vitest.config** must continue to exclude `tests/e2e/**`.
+- Keep **README** and **refactor.md** as the source of truth for API contract, placeholders, and E2E strategy.
+
+**What to reconcile when merging**
+
+- **Backend:** Product backend (or umbrella runbook) must implement Game/Event/Player endpoints and config with `user_id`; if the product uses different paths or auth, update `src/api/client.ts` and config usage accordingly.
+- **Template variables:** If the template uses placeholders (e.g. app name, package name, image names), replace them with product-specific values during the merge.
+- **E2E:** Ensure Cypress and Playwright both run in CI if the product expects them; add any product-specific E2E in the same structure (Cypress for app shell, Playwright for game).
+- **“My game” placeholder:** The current flow (`getGames({ name: user_id })` + pick latest) is intentional as a working placeholder. Replace with a dedicated endpoint or contract when the product defines one; update client, GamePage, and README together.
+
+**Key files to touch in a merge**
+
+- `src/api/client.ts`, `src/api/types.ts` — API contract.
+- `src/pages/GamePage.vue` — initial load and apiContext (playerId, gameId, “my game” resolution).
+- `src/router/index.ts` — routes only as above.
+- `src/App.vue` — no drawer; title + Admin + Logout.
+- `refactor.md`, `README.md` — keep in sync with any post-merge contract or placeholder changes.
