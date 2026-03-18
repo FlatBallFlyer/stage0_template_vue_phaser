@@ -6,7 +6,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/controls'
+      redirect: '/play'
     },
     {
       path: '/login',
@@ -14,64 +14,18 @@ const router = createRouter({
       component: () => import('@/pages/LoginPage.vue'),
       meta: { requiresAuth: false }
     },
-    
-    // Control domain: Control
     {
-      path: '/controls',
-      name: 'Controls',
-      component: () => import('@/pages/ControlsListPage.vue'),
+      path: '/play',
+      name: 'Play',
+      component: () => import('@/pages/GamePage.vue'),
       meta: { requiresAuth: true }
     },
     {
-      path: '/controls/new',
-      name: 'ControlNew',
-      component: () => import('@/pages/ControlNewPage.vue'),
+      path: '/play/:game_id',
+      name: 'PlayGame',
+      component: () => import('@/pages/GamePage.vue'),
       meta: { requiresAuth: true }
     },
-    {
-      path: '/controls/:id',
-      name: 'ControlEdit',
-      component: () => import('@/pages/ControlEditPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    
-    
-    // Create domain: Create
-    {
-      path: '/creates',
-      name: 'Creates',
-      component: () => import('@/pages/CreatesListPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/creates/new',
-      name: 'CreateNew',
-      component: () => import('@/pages/CreateNewPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/creates/:id',
-      name: 'CreateView',
-      component: () => import('@/pages/CreateViewPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    
-    
-    // Consume domain: Consume
-    {
-      path: '/consumes',
-      name: 'Consumes',
-      component: () => import('@/pages/ConsumesListPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/consumes/:id',
-      name: 'ConsumeView',
-      component: () => import('@/pages/ConsumeViewPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    
-    // Admin route
     {
       path: '/admin',
       name: 'Admin',
@@ -83,26 +37,23 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const { isAuthenticated } = useAuth()
-  
-  // Check authentication
+
   if (to.meta.requiresAuth && !isAuthenticated.value) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
   }
-  
-  // Check role-based authorization
+
   const requiredRole = to.meta.requiresRole as string | undefined
   if (requiredRole && !hasStoredRole(requiredRole)) {
-    // Redirect to default page if user doesn't have required role
-    next({ name: 'Controls' })
+    next({ name: 'Play' })
     return
   }
-  
+
   next()
 })
 
 router.afterEach((to) => {
-  document.title = to.path === '/login' ? 'Mentor Hub Login' : 'Sample'
+  document.title = to.path === '/login' ? 'Mentor Hub Login' : 'Game'
 })
 
 export default router
