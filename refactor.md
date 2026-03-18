@@ -229,7 +229,7 @@ Decisions in §6 are recorded; the refactor can be completed per this plan.
 | (pre) | ✅ Done | Initial commit: refactor plan + README E2E/Playwright updates |
 | 1. Types and API | ✅ Done | types.ts + client.ts Game/Event/Player; GET /game + GET /game/:id; EventInput { player_id, name }; unit tests updated |
 | 2. Router + App | ✅ Done | Routes: /, /login, /play, /play/:game_id, /admin; default redirect /play; role-fail → Play; App.vue: no drawer, title Game, Admin + Logout; GamePage.vue placeholder; removed CRUD pages |
-| 3. Game page scaffold | Pending | |
+| 3. Game page scaffold | ✅ Done | phaser ^3.80; src/game/bootstrap.ts + MainScene; GamePage.vue mounts/destroys Phaser canvas |
 | 4. API-driven gameplay | Pending | |
 | 5. E2E (Cypress + Playwright) | Pending | |
 | 6. README and branding | Pending | |
