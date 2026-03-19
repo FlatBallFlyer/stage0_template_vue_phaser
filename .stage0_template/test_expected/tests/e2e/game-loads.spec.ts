@@ -1,5 +1,5 @@
-{% set control = service.data_domains.controls[0] %}
-{% set consume = service.data_domains.consumes[0] %}
+
+
 import { test, expect } from '@playwright/test'
 
 const mockConfig = {
@@ -35,12 +35,12 @@ test.describe('Play screen', () => {
     const controlListResponse = { items: [mockControl], limit: 50, has_more: false, next_cursor: null }
 
     await page.route('**/api/config', (route) => route.fulfill({ status: 200, body: JSON.stringify(mockConfig) }))
-    await page.route('**/api/{{ control | lower }}**', (route) => {
+    await page.route('**/api/control**', (route) => {
       const url = route.request().url()
-      const body = url.match(/\/api\/{{ control | lower }}\/[^/]+$/) ? mockControl : controlListResponse
+      const body = url.match(/\/api\/control\/[^/]+$/) ? mockControl : controlListResponse
       return route.fulfill({ status: 200, body: JSON.stringify(body) })
     })
-    await page.route('**/api/{{ consume | lower }}/**', (route) => route.fulfill({ status: 200, body: JSON.stringify(mockConsume) }))
+    await page.route('**/api/consume/**', (route) => route.fulfill({ status: 200, body: JSON.stringify(mockConsume) }))
 
     await page.goto('/')
     await page.evaluate(() => {

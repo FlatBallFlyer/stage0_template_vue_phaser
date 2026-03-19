@@ -1,16 +1,16 @@
-{% set control = service.data_domains.controls[0] %}
-{% set create = service.data_domains.creates[0] %}
-{% set consume = service.data_domains.consumes[0] %}
+
+
+
 import { describe, it, expect } from 'vitest'
 import type {
   Error,
   Breadcrumb,
-  {{ control }},
-  {{ control }}Input,
-  {{ control }}Update,
-  {{ create }},
-  {{ create }}Input,
-  {{ consume }},
+  Control,
+  ControlInput,
+  ControlUpdate,
+  Create,
+  CreateInput,
+  Consume,
   DevLoginRequest,
   DevLoginResponse,
   ConfigResponse,
@@ -41,25 +41,25 @@ describe('API Types', () => {
     })
   })
 
-  describe('{{ control }}', () => {
-    it('should match {{ control }} interface', () => {
-      const item: {{ control }} = {
+  describe('Control', () => {
+    it('should match Control interface', () => {
+      const item: Control = {
         _id: '507f1f77bcf86cd799439011',
-        name: 'test-{{ control | lower }}',
+        name: 'test-control',
         description: 'Test',
         status: 'active',
         created: breadcrumb,
         saved: breadcrumb
       }
       expect(item._id).toBe('507f1f77bcf86cd799439011')
-      expect(item.name).toBe('test-{{ control | lower }}')
+      expect(item.name).toBe('test-control')
       expect(item.status).toBe('active')
     })
 
     it('should accept archived status', () => {
-      const item: {{ control }} = {
+      const item: Control = {
         _id: '507f1f77bcf86cd799439011',
-        name: 'test-{{ control | lower }}',
+        name: 'test-control',
         status: 'archived',
         created: breadcrumb,
         saved: breadcrumb
@@ -68,33 +68,33 @@ describe('API Types', () => {
     })
   })
 
-  describe('{{ control }}Input', () => {
-    it('should match {{ control }}Input interface', () => {
-      const input: {{ control }}Input = { name: 'test-{{ control | lower }}', description: 'Test', status: 'active' }
-      expect(input.name).toBe('test-{{ control | lower }}')
+  describe('ControlInput', () => {
+    it('should match ControlInput interface', () => {
+      const input: ControlInput = { name: 'test-control', description: 'Test', status: 'active' }
+      expect(input.name).toBe('test-control')
     })
 
     it('should allow optional fields', () => {
-      const input: {{ control }}Input = { name: 'test-{{ control | lower }}' }
+      const input: ControlInput = { name: 'test-control' }
       expect(input.description).toBeUndefined()
     })
   })
 
-  describe('{{ control }}Update', () => {
-    it('should match {{ control }}Update interface with partial fields', () => {
-      const update: {{ control }}Update = { name: 'updated-name' }
+  describe('ControlUpdate', () => {
+    it('should match ControlUpdate interface with partial fields', () => {
+      const update: ControlUpdate = { name: 'updated-name' }
       expect(update.name).toBe('updated-name')
     })
 
     it('should allow all fields to be optional', () => {
-      const update: {{ control }}Update = {}
+      const update: ControlUpdate = {}
       expect(update.name).toBeUndefined()
     })
   })
 
-  describe('{{ create }}', () => {
-    it('should match {{ create }} interface', () => {
-      const item: {{ create }} = {
+  describe('Create', () => {
+    it('should match Create interface', () => {
+      const item: Create = {
         _id: '507f1f77bcf86cd799439011',
         name: 'move',
         created: breadcrumb
@@ -104,24 +104,24 @@ describe('API Types', () => {
     })
   })
 
-  describe('{{ create }}Input', () => {
-    it('should match {{ create }}Input interface (player_id + name slug)', () => {
-      const input: {{ create }}Input = { player_id: 'player-123', name: 'move' }
+  describe('CreateInput', () => {
+    it('should match CreateInput interface (player_id + name slug)', () => {
+      const input: CreateInput = { player_id: 'player-123', name: 'move' }
       expect(input.player_id).toBe('player-123')
       expect(input.name).toBe('move')
     })
   })
 
-  describe('{{ consume }}', () => {
-    it('should match {{ consume }} interface', () => {
-      const item: {{ consume }} = {
+  describe('Consume', () => {
+    it('should match Consume interface', () => {
+      const item: Consume = {
         _id: '507f1f77bcf86cd799439011',
-        name: 'test-{{ consume | lower }}',
+        name: 'test-consume',
         description: 'Test',
         status: 'active'
       }
       expect(item._id).toBe('507f1f77bcf86cd799439011')
-      expect(item.name).toBe('test-{{ consume | lower }}')
+      expect(item.name).toBe('test-consume')
     })
   })
 
@@ -190,7 +190,7 @@ describe('API Types', () => {
 
   describe('InfiniteScrollResponse', () => {
     it('should match InfiniteScrollResponse interface', () => {
-      const response: InfiniteScrollResponse<{{ control }}> = {
+      const response: InfiniteScrollResponse<Control> = {
         items: [],
         limit: 20,
         has_more: true,
@@ -202,7 +202,7 @@ describe('API Types', () => {
     })
 
     it('should allow null next_cursor', () => {
-      const response: InfiniteScrollResponse<{{ consume }}> = {
+      const response: InfiniteScrollResponse<Consume> = {
         items: [],
         limit: 20,
         has_more: false,

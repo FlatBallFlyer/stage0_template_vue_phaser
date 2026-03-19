@@ -1,0 +1,151 @@
+$schema: "https://stage0/schemas/process.schema.yaml"
+$id: "https://stage0/template-vue-phaser/process.yaml"
+title: Process file for Vue Phaser Game SPA template
+version: "1.0"
+
+environment:
+  SERVICE_NAME: Service name from architecture.yaml (e.g. game)
+
+context:
+  - key: info
+    type: path
+    path: specifications.product.info
+  - key: org
+    type: path
+    path: specifications.product.organization
+  - key: architecture
+    type: path
+    path: specifications.architecture.architecture
+  - key: service
+    type: selector
+    path: architecture.domains
+    filter:
+      property: name
+      value: "{{ SERVICE_NAME }}"
+  - key: repo
+    type: selector
+    path: service.repos
+    filter:
+      property: type
+      value: "spa"
+
+requires:
+  - info.name
+  - info.slug
+  - org.name
+  - org.email
+  - architecture.domains
+  - service.name
+  - service.data_domains.controls
+  - service.data_domains.creates
+  - service.data_domains.consumes
+  - repo.name
+  - repo.port
+  - repo.type
+
+templates:
+  - path: "./.github/workflows/docker-push.yml"
+    merge: true
+  - path: "./LICENSE"
+    merge: true
+  - path: "./README.md"
+    merge: true
+  - path: "./index.html"
+    merge: true
+  - path: "./Makefile"
+    output: "/dev/null"
+    merge: true
+  - path: "./Dockerfile"
+    merge: true
+  - path: "./package.json"
+    merge: true
+  - path: "./vite.config.ts"
+    merge: true
+  - path: "./cypress.config.ts"
+    merge: true
+  - path: "./playwright.config.ts"
+    merge: true
+  - path: "./vitest.config.ts"
+    merge: true
+  - path: "./tsconfig.json"
+    merge: true
+  - path: "./tsconfig.node.json"
+    merge: true
+  - path: "./nginx.conf.template"
+    merge: true
+  - path: "./.gitignore"
+    merge: true
+  - path: "./.dockerignore"
+    merge: true
+
+  # API types and client (data-domain driven)
+  - path: "./src/api/types.ts"
+    merge: true
+  - path: "./src/api/client.ts"
+    merge: true
+  - path: "./src/api/client.test.ts"
+    merge: true
+  - path: "./src/api/client.test.control.template.ts"
+    mergeFor:
+      items: service.data_domains.controls
+      output: "./src/api/{{ item }}.client.test.ts"
+  - path: "./src/api/client.test.create.template.ts"
+    mergeFor:
+      items: service.data_domains.creates
+      output: "./src/api/{{ item }}.client.test.ts"
+  - path: "./src/api/client.test.consume.template.ts"
+    mergeFor:
+      items: service.data_domains.consumes
+      output: "./src/api/{{ item }}.client.test.ts"
+  - path: "./src/api/types.test.ts"
+    merge: true
+
+  # Pages and app shell
+  - path: "./src/pages/LoginPage.vue"
+    merge: true
+  - path: "./src/pages/AdminPage.vue"
+    merge: true
+  - path: "./src/pages/GamePage.vue"
+    merge: true
+  - path: "./src/App.vue"
+    merge: true
+  - path: "./src/router/index.ts"
+    merge: true
+  - path: "./src/main.ts"
+    merge: true
+  - path: "./src/vite-env.d.ts"
+    merge: true
+  - path: "./src/stores/ui.ts"
+    merge: true
+  - path: "./src/plugins/vuetify.ts"
+    merge: true
+  - path: "./src/composables/useAuth.ts"
+    merge: true
+  - path: "./src/composables/useConfig.ts"
+    merge: true
+  - path: "./src/composables/useRoles.ts"
+    merge: true
+  - path: "./src/composables/useAuth.test.ts"
+    merge: true
+  - path: "./src/composables/useConfig.test.ts"
+    merge: true
+  - path: "./src/composables/useRoles.test.ts"
+    merge: true
+
+  # Game layer (Phaser)
+  - path: "./src/game/apiContext.ts"
+    merge: true
+  - path: "./src/game/bootstrap.ts"
+    merge: true
+  - path: "./src/game/scenes/MainScene.ts"
+    merge: true
+
+  # Cypress and Playwright
+  - path: "./cypress/e2e/navigation.cy.ts"
+    merge: true
+  - path: "./cypress/support/commands.ts"
+    merge: true
+  - path: "./cypress/support/e2e.ts"
+    merge: true
+  - path: "./tests/e2e/game-loads.spec.ts"
+    merge: true

@@ -1,13 +1,13 @@
-import type { {% for item in service.data_domains.controls %}
-  {{ item }},
-  {{ item }}Input,
-  {{ item }}Update,
-{% endfor %}{% for item in service.data_domains.creates %}
-  {{ item }},
-  {{ item }}Input,
-{% endfor %}{% for item in service.data_domains.consumes %}
-  {{ item }},
-{% endfor %}
+import type { 
+  Control,
+  ControlInput,
+  ControlUpdate,
+
+  Create,
+  CreateInput,
+
+  Consume,
+
   DevLoginRequest,
   DevLoginResponse,
   ConfigResponse,
@@ -126,8 +126,8 @@ export const api = {
   },
 
   // Control endpoints (placeholder "my control" flow: GET ?name={user_id}, pick latest)
-{% for item in service.data_domains.controls %}
-  async get{{ item }}s(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<{{ item }}>> {
+
+  async getControls(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Control>> {
     const queryParams = new URLSearchParams()
     if (params?.name) queryParams.append('name', params.name)
     if (params?.after_id) queryParams.append('after_id', params.after_id)
@@ -136,31 +136,31 @@ export const api = {
     if (params?.order) queryParams.append('order', params.order)
 
     const query = queryParams.toString()
-    return request<InfiniteScrollResponse<{{ item }}>>(`/{{ item | lower }}${query ? `?${query}` : ''}`)
+    return request<InfiniteScrollResponse<Control>>(`/control${query ? `?${query}` : ''}`)
   },
 
-  async get{{ item }}({{ item | lower }}Id: string): Promise<{{ item }}> {
-    return request<{{ item }}>(`/{{ item | lower }}/${{ "{" }}{{ item | lower }}Id{{ "}" }}`)
+  async getControl(controlId: string): Promise<Control> {
+    return request<Control>(`/control/${controlId}`)
   },
 
-  async create{{ item }}(data: {{ item }}Input): Promise<{ _id: string }> {
-    return request<{ _id: string }>('/{{ item | lower }}', {
+  async createControl(data: ControlInput): Promise<{ _id: string }> {
+    return request<{ _id: string }>('/control', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   },
 
-  async update{{ item }}({{ item | lower }}Id: string, data: {{ item }}Update): Promise<{{ item }}> {
-    return request<{{ item }}>(`/{{ item | lower }}/${{ "{" }}{{ item | lower }}Id{{ "}" }}`, {
+  async updateControl(controlId: string, data: ControlUpdate): Promise<Control> {
+    return request<Control>(`/control/${controlId}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     })
   },
 
-{% endfor %}
+
   // Create endpoints (fine-grained: name = one-word slug, e.g. move, jump)
-{% for item in service.data_domains.creates %}
-  async get{{ item }}s(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<{{ item }}>> {
+
+  async getCreates(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Create>> {
     const queryParams = new URLSearchParams()
     if (params?.name) queryParams.append('name', params.name)
     if (params?.after_id) queryParams.append('after_id', params.after_id)
@@ -169,24 +169,24 @@ export const api = {
     if (params?.order) queryParams.append('order', params.order)
 
     const query = queryParams.toString()
-    return request<InfiniteScrollResponse<{{ item }}>>(`/{{ item | lower }}${query ? `?${query}` : ''}`)
+    return request<InfiniteScrollResponse<Create>>(`/create${query ? `?${query}` : ''}`)
   },
 
-  async get{{ item }}({{ item | lower }}Id: string): Promise<{{ item }}> {
-    return request<{{ item }}>(`/{{ item | lower }}/${{ "{" }}{{ item | lower }}Id{{ "}" }}`)
+  async getCreate(createId: string): Promise<Create> {
+    return request<Create>(`/create/${createId}`)
   },
 
-  async create{{ item }}(data: {{ item }}Input): Promise<{ _id: string }> {
-    return request<{ _id: string }>('/{{ item | lower }}', {
+  async createCreate(data: CreateInput): Promise<{ _id: string }> {
+    return request<{ _id: string }>('/create', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   },
 
-{% endfor %}
+
   // Consume endpoints
-{% for item in service.data_domains.consumes %}
-  async get{{ item }}s(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<{{ item }}>> {
+
+  async getConsumes(params?: InfiniteScrollParams): Promise<InfiniteScrollResponse<Consume>> {
     const queryParams = new URLSearchParams()
     if (params?.name) queryParams.append('name', params.name)
     if (params?.after_id) queryParams.append('after_id', params.after_id)
@@ -195,14 +195,14 @@ export const api = {
     if (params?.order) queryParams.append('order', params.order)
 
     const query = queryParams.toString()
-    return request<InfiniteScrollResponse<{{ item }}>>(`/{{ item | lower }}${query ? `?${query}` : ''}`)
+    return request<InfiniteScrollResponse<Consume>>(`/consume${query ? `?${query}` : ''}`)
   },
 
-  async get{{ item }}({{ item | lower }}Id: string): Promise<{{ item }}> {
-    return request<{{ item }}>(`/{{ item | lower }}/${{ "{" }}{{ item | lower }}Id{{ "}" }}`)
+  async getConsume(consumeId: string): Promise<Consume> {
+    return request<Consume>(`/consume/${consumeId}`)
   },
 
-{% endfor %}
+
 }
 
 export { ApiError }

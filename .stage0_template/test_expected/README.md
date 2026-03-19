@@ -4,8 +4,8 @@ Vue 3 + Phaser 3 SPA: **Login**, **Admin**, and a full-screen **Play** route. Th
 
 ## Prerequisites
 
-- {{ info.name }} [Developers Edition](https://github.com/{{ org.git_org }}/mentorhub/blob/main/CONTRIBUTING.md)
-- Developer [SPA Standard Prerequisites](https://github.com/{{ org.git_org }}/mentorhub/blob/main/DeveloperEdition/standards/spa_standards.md)
+- Game Star [Developers Edition](https://github.com/agile-learning-institute/mentorhub/blob/main/CONTRIBUTING.md)
+- Developer [SPA Standard Prerequisites](https://github.com/agile-learning-institute/mentorhub/blob/main/DeveloperEdition/standards/spa_standards.md)
 
 ## Quick Start
 
@@ -42,7 +42,7 @@ npm run container
 - **`/play/:game_id`** — Full-screen play for a specific control (e.g. launch by another microservice).
 - **`/admin`** — Admin page (requires `admin` role).
 
-No navigation drawer; app bar shows product name ({{ info.name }}), Admin (if admin), and Logout.
+No navigation drawer; app bar shows product name (Game Star), Admin (if admin), and Logout.
 
 ## API: Control / Create / Consume
 
@@ -85,4 +85,4 @@ src/
 ## Configuration
 
 - Config: `/api/config`. Consume id from `config.token.user_id` (or `config.token.claims`).
-- Dev proxy: `/api` and `/dev-login` → `http://localhost:{{ repo.port - 1 }}`.
+- Dev proxy: `/api` and `/dev-login` → `http://localhost:8389`.

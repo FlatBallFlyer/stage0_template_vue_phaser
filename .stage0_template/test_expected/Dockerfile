@@ -15,10 +15,10 @@ RUN DATE=$(date "+%Y-%m-%d:%H:%M:%S") && echo "$DATE" > ./dist/patch.txt
 # Deploy stage
 FROM nginx:stable-alpine
 
-LABEL org.opencontainers.image.source="{{ org.git_host }}/{{ org.git_org }}/{{ info.slug }}_{{ service.name }}_spa"
+LABEL org.opencontainers.image.source="https://github.com/agile-learning-institute/star_game_spa"
 
-ENV API_HOST={{ info.slug }}_{{ service.name }}_api
-ENV API_PORT={{ repo.port - 1 }}
+ENV API_HOST=star_game_api
+ENV API_PORT=8389
 
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf.template /etc/nginx/nginx.conf.template

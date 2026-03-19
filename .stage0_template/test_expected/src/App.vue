@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar color="primary" prominent>
-      <v-app-bar-title>{{ info.name }}</v-app-bar-title>
+      <v-app-bar-title>Game Star</v-app-bar-title>
       <v-spacer />
       <v-btn
         v-if="hasAdminRole"

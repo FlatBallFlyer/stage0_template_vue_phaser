@@ -1,19 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { api } from './client'
-import type { EventInput } from './types'
+import type { {{ item }}Input } from './types'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 
-describe('API Client - Event Endpoints', () => {
+describe('API Client - {{ item }} Endpoints', () => {
   beforeEach(() => {
     mockFetch.mockClear()
     localStorage.clear()
     localStorage.setItem('access_token', 'test-token')
   })
 
-  it('should get all events', async () => {
-    const mockEvents = [
+  it('should get all {{ item | lower }}s', async () => {
+    const mockItems = [
       {
         _id: '507f1f77bcf86cd799439011',
         name: 'move',
@@ -25,7 +25,7 @@ describe('API Client - Event Endpoints', () => {
         }
       }
     ]
-    const mockResponse = { items: mockEvents, limit: 20, has_more: false, next_cursor: null }
+    const mockResponse = { items: mockItems, limit: 20, has_more: false, next_cursor: null }
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -34,13 +34,13 @@ describe('API Client - Event Endpoints', () => {
       json: async () => mockResponse
     })
 
-    const result = await api.getEvents()
+    const result = await api.get{{ item }}s()
     expect(result).toEqual(mockResponse)
-    expect(mockFetch).toHaveBeenCalledWith('/api/event', expect.any(Object))
+    expect(mockFetch).toHaveBeenCalledWith('/api/{{ item | lower }}', expect.any(Object))
   })
 
-  it('should get a single event', async () => {
-    const mockEvent = {
+  it('should get a single {{ item | lower }}', async () => {
+    const mockItem = {
       _id: '507f1f77bcf86cd799439011',
       name: 'jump',
       created: {
@@ -55,15 +55,15 @@ describe('API Client - Event Endpoints', () => {
       ok: true,
       status: 200,
       headers: { get: (name: string) => name === 'content-length' ? '100' : null },
-      json: async () => mockEvent
+      json: async () => mockItem
     })
 
-    const result = await api.getEvent('507f1f77bcf86cd799439011')
-    expect(result).toEqual(mockEvent)
+    const result = await api.get{{ item }}('507f1f77bcf86cd799439011')
+    expect(result).toEqual(mockItem)
   })
 
-  it('should create an event (player_id + name slug)', async () => {
-    const input: EventInput = { player_id: 'player-123', name: 'move' }
+  it('should create a {{ item | lower }} (player_id + name slug)', async () => {
+    const input: {{ item }}Input = { player_id: 'player-123', name: 'move' }
     const mockResponse = { _id: '507f1f77bcf86cd799439011' }
 
     mockFetch.mockResolvedValueOnce({
@@ -73,10 +73,10 @@ describe('API Client - Event Endpoints', () => {
       json: async () => mockResponse
     })
 
-    const result = await api.createEvent(input)
+    const result = await api.create{{ item }}(input)
     expect(result).toEqual(mockResponse)
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/event',
+      '/api/{{ item | lower }}',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify(input)

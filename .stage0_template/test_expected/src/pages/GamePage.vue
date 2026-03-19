@@ -1,5 +1,5 @@
 <template>
-{% raw %}
+
   <div class="game-page-wrapper">
     <div ref="gameContainer" class="game-page" data-automation-id="game-container" />
     <div v-if="error" class="game-overlay error">
@@ -14,27 +14,27 @@
       <span v-if="controlData?.description">{{ controlData.description }}</span>
     </div>
   </div>
-{% endraw %}
+
 </template>
 
 <script setup lang="ts">
-{% set control = service.data_domains.controls[0] %}
-{% set create = service.data_domains.creates[0] %}
-{% set consume = service.data_domains.consumes[0] %}
+
+
+
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { createGame } from '@/game/bootstrap'
 import { api } from '@/api/client'
 import type Phaser from 'phaser'
-import type { {{ control }}, {{ consume }} } from '@/api/types'
+import type { Control, Consume } from '@/api/types'
 import type { ControlApiContext } from '@/game/apiContext'
 
 const route = useRoute()
 const gameContainer = ref<HTMLElement | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
-const consumeData = ref<{{ consume }} | null>(null)
-const controlData = ref<{{ control }} | null>(null)
+const consumeData = ref<Consume | null>(null)
+const controlData = ref<Control | null>(null)
 const controlIdRef = ref<string | null>(null)
 
 let gameInstance: Phaser.Game | null = null
@@ -52,12 +52,12 @@ async function loadInitialData() {
       return
     }
 
-    let controlRes: {{ control }}
+    let controlRes: Control
     const controlIdFromRoute = route.params.game_id as string | undefined
     if (controlIdFromRoute) {
-      controlRes = await api.get{{ control }}(controlIdFromRoute)
+      controlRes = await api.getControl(controlIdFromRoute)
     } else {
-      const list = await api.get{{ control }}s({
+      const list = await api.getControls({
         name: pid,
         limit: 50,
         sort_by: 'created.at_time',
@@ -65,7 +65,7 @@ async function loadInitialData() {
       })
       const latest = list.items?.[0]
       if (!latest) {
-        error.value = 'No {{ control | lower }} found'
+        error.value = 'No control found'
         loading.value = false
         return
       }
@@ -75,7 +75,7 @@ async function loadInitialData() {
     controlIdRef.value = controlRes._id
     controlData.value = controlRes
 
-    const consumeRes = await api.get{{ consume }}(pid)
+    const consumeRes = await api.getConsume(pid)
     consumeData.value = consumeRes
 
     loading.value = false
@@ -89,8 +89,8 @@ async function loadInitialData() {
 function buildApiContext(
   consumeId: string,
   controlId: string,
-  consumeDataParam: {{ consume }},
-  controlDataParam: {{ control }}
+  consumeDataParam: Consume,
+  controlDataParam: Control
 ): ControlApiContext {
   return {
     consumeId,
@@ -98,11 +98,11 @@ function buildApiContext(
     consume: consumeDataParam,
     control: controlDataParam,
     recordCreate: async (payload) => {
-      await api.create{{ create }}(payload)
+      await api.createCreate(payload)
     },
     updateControlProgress: async (patch) => {
-      await api.update{{ control }}(controlId, patch)
-      const updated = await api.get{{ control }}(controlId)
+      await api.updateControl(controlId, patch)
+      const updated = await api.getControl(controlId)
       controlData.value = updated
     }
   }

@@ -53,7 +53,7 @@ router.beforeEach((to, _from, next) => {
 })
 
 router.afterEach((to) => {
-  document.title = to.path === '/login' ? '{{ info.name }} Login' : '{{ info.name }}'
+  document.title = to.path === '/login' ? 'Game Star Login' : 'Game Star'
 })
 
 export default router

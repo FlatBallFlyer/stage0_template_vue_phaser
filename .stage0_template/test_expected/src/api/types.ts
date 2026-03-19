@@ -1,4 +1,4 @@
-// Type definitions based on OpenAPI spec ({{ service.data_domains.controls[0] }} / {{ service.data_domains.creates[0] }} / {{ service.data_domains.consumes[0] }})
+// Type definitions based on OpenAPI spec (Control / Create / Consume)
 
 export interface Error {
   error: string
@@ -11,9 +11,9 @@ export interface Breadcrumb {
   correlation_id: string
 }
 
-{% for item in service.data_domains.controls %}
-// {{ item }} Domain (progress, sessions)
-export interface {{ item }} {
+
+// Control Domain (progress, sessions)
+export interface Control {
   _id: string
   name: string
   description?: string
@@ -22,21 +22,21 @@ export interface {{ item }} {
   saved: Breadcrumb
 }
 
-export interface {{ item }}Input {
+export interface ControlInput {
   name: string
   description?: string
   status?: 'active' | 'archived'
 }
 
-export interface {{ item }}Update {
+export interface ControlUpdate {
   name?: string
   description?: string
   status?: 'active' | 'archived'
 }
-{% endfor %}
-{% for item in service.data_domains.creates %}
-// {{ item }} Domain (fine-grained events; POST body: player_id + name slug)
-export interface {{ item }} {
+
+
+// Create Domain (fine-grained events; POST body: player_id + name slug)
+export interface Create {
   _id: string
   name: string
   description?: string
@@ -44,21 +44,21 @@ export interface {{ item }} {
   created: Breadcrumb
 }
 
-/** POST /{{ item | lower }} body: name is a non-unique one-word slug (e.g. move, jump) */
-export interface {{ item }}Input {
+/** POST /create body: name is a non-unique one-word slug (e.g. move, jump) */
+export interface CreateInput {
   player_id: string
   name: string
 }
-{% endfor %}
-{% for item in service.data_domains.consumes %}
-// {{ item }} Domain
-export interface {{ item }} {
+
+
+// Consume Domain
+export interface Consume {
   _id: string
   name: string
   description?: string
   status?: string
 }
-{% endfor %}
+
 
 // Authentication
 export interface DevLoginRequest {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { api, ApiError } from './client'
-import type { GameInput, GameUpdate } from './types'
+import type { ControlInput, ControlUpdate } from './types'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch
@@ -12,18 +12,18 @@ const breadcrumb = {
   correlation_id: 'corr-123'
 }
 
-describe('API Client - Game Endpoints', () => {
+describe('API Client - Control Endpoints', () => {
   beforeEach(() => {
     mockFetch.mockClear()
     localStorage.clear()
     localStorage.setItem('access_token', 'test-token')
   })
 
-  it('should get all games', async () => {
-    const mockGames = [
-      { _id: '507f1f77bcf86cd799439011', name: 'test-game', status: 'active' as const, created: breadcrumb, saved: breadcrumb }
+  it('should get all controls', async () => {
+    const mockItems = [
+      { _id: '507f1f77bcf86cd799439011', name: 'test-control', status: 'active' as const, created: breadcrumb, saved: breadcrumb }
     ]
-    const mockResponse = { items: mockGames, limit: 20, has_more: false, next_cursor: null }
+    const mockResponse = { items: mockItems, limit: 20, has_more: false, next_cursor: null }
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -32,12 +32,12 @@ describe('API Client - Game Endpoints', () => {
       json: async () => mockResponse
     })
 
-    const result = await api.getGames()
+    const result = await api.getControls()
     expect(result).toEqual(mockResponse)
-    expect(mockFetch).toHaveBeenCalledWith('/api/game', expect.any(Object))
+    expect(mockFetch).toHaveBeenCalledWith('/api/control', expect.any(Object))
   })
 
-  it('should get games with name query (placeholder "my game" uses name=user_id)', async () => {
+  it('should get controls with name query (placeholder "my control" uses name=user_id)', async () => {
     const mockResponse = { items: [], limit: 50, has_more: false, next_cursor: null }
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -46,30 +46,30 @@ describe('API Client - Game Endpoints', () => {
       json: async () => mockResponse
     })
 
-    await api.getGames({ name: 'user-123', limit: 50, sort_by: 'created.at_time', order: 'desc' })
+    await api.getControls({ name: 'user-123', limit: 50, sort_by: 'created.at_time', order: 'desc' })
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/game?name=user-123&limit=50&sort_by=created.at_time&order=desc',
+      '/api/control?name=user-123&limit=50&sort_by=created.at_time&order=desc',
       expect.any(Object)
     )
   })
 
-  it('should get a single game by id', async () => {
-    const mockGame = { _id: '507f1f77bcf86cd799439011', name: 'test-game', status: 'active' as const, created: breadcrumb, saved: breadcrumb }
+  it('should get a single control by id', async () => {
+    const mockItem = { _id: '507f1f77bcf86cd799439011', name: 'test-control', status: 'active' as const, created: breadcrumb, saved: breadcrumb }
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
       headers: { get: (name: string) => name === 'content-length' ? '100' : null },
-      json: async () => mockGame
+      json: async () => mockItem
     })
 
-    const result = await api.getGame('507f1f77bcf86cd799439011')
-    expect(result).toEqual(mockGame)
-    expect(mockFetch).toHaveBeenCalledWith('/api/game/507f1f77bcf86cd799439011', expect.any(Object))
+    const result = await api.getControl('507f1f77bcf86cd799439011')
+    expect(result).toEqual(mockItem)
+    expect(mockFetch).toHaveBeenCalledWith('/api/control/507f1f77bcf86cd799439011', expect.any(Object))
   })
 
-  it('should create a game', async () => {
-    const input: GameInput = { name: 'new-game', description: 'New', status: 'active' }
+  it('should create a control', async () => {
+    const input: ControlInput = { name: 'new-control', description: 'New', status: 'active' }
     const mockResponse = { _id: '507f1f77bcf86cd799439011' }
 
     mockFetch.mockResolvedValueOnce({
@@ -79,29 +79,29 @@ describe('API Client - Game Endpoints', () => {
       json: async () => mockResponse
     })
 
-    const result = await api.createGame(input)
+    const result = await api.createControl(input)
     expect(result).toEqual(mockResponse)
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/game',
+      '/api/control',
       expect.objectContaining({ method: 'POST', body: JSON.stringify(input) })
     )
   })
 
-  it('should update a game', async () => {
-    const update: GameUpdate = { name: 'updated-name' }
-    const mockGame = { _id: '507f1f77bcf86cd799439011', name: 'updated-name', status: 'active' as const, created: breadcrumb, saved: breadcrumb }
+  it('should update a control', async () => {
+    const update: ControlUpdate = { name: 'updated-name' }
+    const mockItem = { _id: '507f1f77bcf86cd799439011', name: 'updated-name', status: 'active' as const, created: breadcrumb, saved: breadcrumb }
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
       headers: { get: (name: string) => name === 'content-length' ? '100' : null },
-      json: async () => mockGame
+      json: async () => mockItem
     })
 
-    const result = await api.updateGame('507f1f77bcf86cd799439011', update)
-    expect(result).toEqual(mockGame)
+    const result = await api.updateControl('507f1f77bcf86cd799439011', update)
+    expect(result).toEqual(mockItem)
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/game/507f1f77bcf86cd799439011',
+      '/api/control/507f1f77bcf86cd799439011',
       expect.objectContaining({ method: 'PATCH', body: JSON.stringify(update) })
     )
   })
@@ -113,7 +113,7 @@ describe('API Client - Game Endpoints', () => {
       statusText: 'Not Found',
       json: async () => ({ error: 'Resource not found' })
     })
-    await expect(api.getGame('invalid-id')).rejects.toThrow(ApiError)
+    await expect(api.getControl('invalid-id')).rejects.toThrow(ApiError)
   })
 
   it('should handle 401', async () => {
@@ -123,6 +123,6 @@ describe('API Client - Game Endpoints', () => {
       statusText: 'Unauthorized',
       json: async () => ({ error: 'Unauthorized' })
     })
-    await expect(api.getGames()).rejects.toThrow('Unauthorized')
+    await expect(api.getControls()).rejects.toThrow('Unauthorized')
   })
 })
