@@ -15,3 +15,4 @@ app.use(vuetify)
 app.use(VueQueryPlugin)
 
 app.mount('#app')
+

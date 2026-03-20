@@ -69,3 +69,4 @@ export function getStoredRoles(): string[] {
 export function hasStoredRole(role: string): boolean {
   return getStoredRoles().includes(role)
 }
+

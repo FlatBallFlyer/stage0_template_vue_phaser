@@ -47,44 +47,23 @@ templates:
   - path: "./.github/workflows/docker-push.yml.template"
     output: "./.github/workflows/docker-push.yml"
     merge: true
-  - path: "./LICENSE"
-    merge: true
-  - path: "./README.md"
-    merge: true
-  - path: "./index.html"
+  - path: "./README.md.template"
+    output: "./README.md"
     merge: true
   - path: "./Makefile"
     output: "/dev/null"
     merge: true
+  - path: "./index.html"
+    merge: true
   - path: "./Dockerfile"
     merge: true
   - path: "./package.json"
-    merge: true
-  - path: "./vite.config.ts"
-    merge: true
-  - path: "./cypress.config.ts"
-    merge: true
-  - path: "./playwright.config.ts"
-    merge: true
-  - path: "./vitest.config.ts"
-    merge: true
-  - path: "./tsconfig.json"
-    merge: true
-  - path: "./tsconfig.node.json"
-    merge: true
-  - path: "./nginx.conf.template"
-    merge: true
-  - path: "./.gitignore"
-    merge: true
-  - path: "./.dockerignore"
     merge: true
 
   # API types and client (data-domain driven)
   - path: "./src/api/types.ts"
     merge: true
   - path: "./src/api/client.ts"
-    merge: true
-  - path: "./src/api/client.test.ts"
     merge: true
   - path: "./src/api/client.test.control.template.ts"
     mergeFor:
@@ -102,51 +81,17 @@ templates:
     merge: true
 
   # Pages and app shell
-  - path: "./src/pages/LoginPage.vue"
-    merge: true
-  - path: "./src/pages/AdminPage.vue"
-    merge: true
   - path: "./src/pages/GamePage.vue"
     merge: true
   - path: "./src/App.vue"
     merge: true
   - path: "./src/router/index.ts"
     merge: true
-  - path: "./src/main.ts"
-    merge: true
-  - path: "./src/vite-env.d.ts"
-    merge: true
-  - path: "./src/stores/ui.ts"
-    merge: true
-  - path: "./src/plugins/vuetify.ts"
-    merge: true
-  - path: "./src/composables/useAuth.ts"
-    merge: true
-  - path: "./src/composables/useConfig.ts"
-    merge: true
-  - path: "./src/composables/useRoles.ts"
-    merge: true
-  - path: "./src/composables/useAuth.test.ts"
-    merge: true
-  - path: "./src/composables/useConfig.test.ts"
-    merge: true
-  - path: "./src/composables/useRoles.test.ts"
-    merge: true
 
   # Game layer (Phaser)
   - path: "./src/game/apiContext.ts"
     merge: true
-  - path: "./src/game/bootstrap.ts"
-    merge: true
-  - path: "./src/game/scenes/MainScene.ts"
-    merge: true
 
-  # Cypress and Playwright
-  - path: "./cypress/e2e/navigation.cy.ts"
-    merge: true
-  - path: "./cypress/support/commands.ts"
-    merge: true
-  - path: "./cypress/support/e2e.ts"
-    merge: true
+  # Playwright (Jinja for API paths / mocks)
   - path: "./tests/e2e/game-loads.spec.ts"
     merge: true

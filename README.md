@@ -1,88 +1,30 @@
-# template_spa (Play)
+# Vue Phaser game SPA (Stage0 template)
 
-Vue 3 + Phaser 3 SPA: **Login**, **Admin**, and a full-screen **Play** route. The app uses the API to load control/consume state, record fine-grained create events, and update control progress.
+## Quick start
 
-## Prerequisites
+This repo is a **Stage0 merge template** for a Vue 3 + Phaser 3 game SPA. After merge, consumers get a project README from `README.md.template` (product documentation with specifications applied). The file you are reading now is **only for people working on or testing the template**.
 
-- {{ info.name }} [Developers Edition](https://github.com/{{ org.git_org }}/mentorhub/blob/main/CONTRIBUTING.md)
-- Developer [SPA Standard Prerequisites](https://github.com/{{ org.git_org }}/mentorhub/blob/main/DeveloperEdition/standards/spa_standards.md)
+See the [Template Guide](https://github.com/agile-learning-institute/stage0_runbook_merge/blob/main/TEMPLATE_GUIDE.md). Processing rules live in [`.stage0_template/process.yaml`](./.stage0_template/process.yaml). Sample specification YAMLs are under [`.stage0_template/Specifications/`](./.stage0_template/Specifications/).
 
-## Quick Start
+Set **`SERVICE_NAME`** to the architecture domain name for the SPA (e.g. `game`) when merging.
 
-```sh
-npm run service
-```
-
-## Developer Commands
+## Template commands
 
 ```sh
-npm install
-npm run build
-npm run dev
+# Test the template (Docker merge vs test_expected; uses ~/tmp/testRepo)
+make test
 
-npm run test
-npm run test:coverage
-npm run test:ui
+# Diff one output path after a test run
+make diff README.md
 
-npm run cypress
-npm run cypress:run
-npm run test:e2e:game   # Playwright play E2E
+# Refresh test_expected from last test output
+make take README.md
 
-npm run api
-npm run service
-npm run open
-npm run container
+make clean
+
+# Merge into current directory (destructive: removes .stage0_template)
+# Example:
+SERVICE_NAME=game make merge ./.stage0_template/Specifications
 ```
 
-## Routes
-
-- **`/`** — Redirects to `/play` (or `/login` if unauthenticated).
-- **`/login`** — Login (uses `/dev-login`; JWT in localStorage).
-- **`/play`** — Full-screen Phaser play (user's most recent control).
-- **`/play/:game_id`** — Full-screen play for a specific control (e.g. launch by another microservice).
-- **`/admin`** — Admin page (requires `admin` role).
-
-No navigation drawer; app bar shows product name ({{ info.name }}), Admin (if admin), and Logout.
-
-## API: Control / Create / Consume
-
-Entity names and paths come from the template merge (e.g. Control, Create, Consume). Endpoints: `GET /api/control`, `GET /api/create`, `GET /api/consume` (and by-id, POST/PATCH as per domain). Consume id comes from `config.token.user_id` (or `config.token.claims.sub`). Placeholder "my control" flow: `GET /api/control?name={user_id}`, pick latest. Create: `POST /api/create` with body `{ player_id, name }` (name = one-word slug).
-
-See `src/api/types.ts` and `src/api/client.ts` for types and methods.
-
-## Play (Phaser) Flow
-
-1. **GamePage.vue** loads config, control (most recent or by `game_id` from route), and consume.
-2. It builds an **apiContext** (controlId, consumeId, control, consume, `recordCreate`, `updateControlProgress`) and passes it into the Phaser bootstrap.
-3. **MainScene** uses the context: on click/tap they call `recordCreate({ player_id, name: 'move' })` and, every N actions, `updateControlProgress(patch)`.
-4. Overlay shows consume name and control progress. On API failure, an error overlay with Retry is shown.
-
-## Architecture
-
-```
-src/
-  api/           # Control/Create/Consume types and client (from template)
-  game/          # Phaser bootstrap, apiContext, scenes (e.g. MainScene)
-  pages/         # LoginPage, AdminPage, GamePage
-  composables/   # useAuth, useConfig, useRoles
-  stores/        # UI state
-  router/        # /login, /play, /play/:game_id, /admin
-  plugins/       # Vuetify
-```
-
-## Testing
-
-- **Unit** — Vitest: `npm run test`. Covers API client (Control/Create/Consume) and composables.
-- **E2E — Cypress** — Login, redirect to `/play`, play container, admin, logout. `npm run cypress` or `npm run cypress:run`.
-- **E2E — Playwright** — Play screen: unauthenticated redirect; with mocked API, play container and canvas visible. `npm run test:e2e:game`. See [Playwright documentation](https://playwright.dev/docs/intro).
-
-## Technology Stack
-
-- Vue 3, TypeScript, Vite 7, Vuetify 3, Vue Router, Pinia, TanStack Query
-- Phaser 3
-- Vitest (unit), Cypress (E2E), Playwright (E2E play)
-
-## Configuration
-
-- Config: `/api/config`. Consume id from `config.token.user_id` (or `config.token.claims`).
-- Dev proxy: `/api` and `/dev-login` → `http://localhost:{{ repo.port - 1 }}`.
+The merge step **`Makefile` → `/dev/null`** drops the template-only `Makefile` from the merged tree so downstream projects are not given these maintenance targets.
