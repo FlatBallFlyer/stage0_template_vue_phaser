@@ -1,11 +1,17 @@
 # Build stage
 FROM node:20-alpine AS build
 
+RUN apk add --no-cache git
+
 WORKDIR /app
 
 COPY package.json ./
 
-RUN npm install
+ARG GITHUB_TOKEN=
+RUN if [ -n "$GITHUB_TOKEN" ]; then \
+      git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi && \
+    npm install
 
 COPY . .
 RUN npm run build
