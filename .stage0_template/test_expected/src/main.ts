@@ -1,3 +1,4 @@
+import './bootstrap-auth'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { VueQueryPlugin } from '@tanstack/vue-query'
@@ -15,4 +16,3 @@ app.use(vuetify)
 app.use(VueQueryPlugin)
 
 app.mount('#app')
-

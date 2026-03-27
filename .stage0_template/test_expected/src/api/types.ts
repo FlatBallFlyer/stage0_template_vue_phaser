@@ -60,20 +60,6 @@ export interface Consume {
 }
 
 
-// Authentication
-export interface DevLoginRequest {
-  subject?: string
-  roles?: string[]
-}
-
-export interface DevLoginResponse {
-  access_token: string
-  token_type: string
-  expires_at: string
-  subject: string
-  roles: string[]
-}
-
 // Configuration (playerId from config.token.user_id)
 export interface ConfigResponse {
   config_items: unknown[]

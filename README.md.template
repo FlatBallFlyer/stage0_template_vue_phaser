@@ -37,7 +37,7 @@ npm run container
 ## Routes
 
 - **`/`** — Redirects to `/play` (or `/login` if unauthenticated).
-- **`/login`** — Login (uses `/dev-login`; JWT in localStorage).
+- **`/login`** — Sign-in gate (IdP or URL hash → `localStorage`; see `bootstrap-auth.ts`).
 - **`/play`** — Full-screen Phaser play (user's most recent control).
 - **`/play/:game_id`** — Full-screen play for a specific control (e.g. launch by another microservice).
 - **`/admin`** — Admin page (requires `admin` role).
@@ -85,4 +85,4 @@ src/
 ## Configuration
 
 - Config: `/api/config`. Consume id from `config.token.user_id` (or `config.token.claims`).
-- Dev proxy: `/api` and `/dev-login` → `http://localhost:{{ repo.port - 1 }}`.
+- Dev proxy: `/api` → `http://localhost:{{ repo.port - 1 }}`.
